@@ -30,7 +30,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   
 }
 
-#calculate SMA !ask questions!
+#calculate SMA !ask questions!!
 mySMA <- function(input, n, newRowlist) { # version requested in question
   input <- newRowList[[1]]$Close
   n <- 20
