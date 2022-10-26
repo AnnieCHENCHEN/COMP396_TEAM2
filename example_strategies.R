@@ -22,7 +22,8 @@ example_params <- list(
                     "bbands_trend_following"=list(lookback=50,sdParam=1.5,series=c(1,3,5,7,8,9),posSizes=rep(1,10)),
                     "bbands_holding_period"=list(lookback=50,sdParam=1.5,series=c(1,3),posSizes=rep(1,10),holdPeriod=6),
                     "simple_limit"=list(spreadPercentage=0.001,inventoryLimits=rep(10,10)),
-                    "extreme_limit"=list(spreadPercentage=0.001,inventoryLimits=rep(10,10))
+                    "extreme_limit"=list(spreadPercentage=0.001,inventoryLimits=rep(10,10)),
+                    "meanReversion"=list(lookback=20,sdParam=1.5,series=1,posSizes=rep(1,10), profit_target=50000)
                     )
 
 load_strategy <- function(strategy) {
