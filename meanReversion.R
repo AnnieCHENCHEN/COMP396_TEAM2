@@ -1,6 +1,16 @@
 # Mean reversion strategy (with BBands with proit target)
 # This strategy uses only marker orders
 
+# our questions:
+# 1. we are not sure the calculation of "profit" whether is correct or not?
+# 2. The upper bound of profit target, we don't know how to calculate
+# 3. We know the logic about our code is weird now, but we cannot tell why. Could you give us some advice?
+
+# The fomulation of profit target
+## lower_bound = cl*1.2
+## upper_bound = (we are not sure how to calculate this part)
+## profit_target = lower_bound + ((upper_bound - lower_bound)/2)
+
 maxRows <- 3100 # used to initialize a matrix to store closing prices
 # set maxRows as the number of rows in data (it can be larger but should not be smaller)
 
@@ -36,7 +46,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       }
     
       # we want to sum up the profit (1 to i) of the whole trading, we use this profit to compare with our profit target 
-      # which is profit target =50000
+      # which is params$profit_target =50000 (we set this by ourselevs)
       profit <- sapply(info$netWorth[i], sum, simplify = TRUE) 
       
       # profit < profit target, we will contiune this strategy and this "if" command
