@@ -35,7 +35,14 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       }
         
       else if (pos[i] == -1){
+        lowestPrice = min(store$cl[[1:i]])
+        minStopLoss_price = (1+0.1) * lowestPrice
         
+        if (store$cl[[i]] >= minStopLoss_price){ #
+          pos[i] <- 0
+        }else{ #store$cl[[i]] < minStopLoss_price
+          next #continue stay in a trade
+        } 
         
       }
       }
