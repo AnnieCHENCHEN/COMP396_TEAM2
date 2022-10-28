@@ -26,7 +26,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   
   marketOrders <- -currentPos #close all positions
   pos <- allzero #set pos as a zero vector
-  profit <- 0 #inital profit=0
+  profit <- rep(0,length(store))  # create a profit vector
   
   
   
@@ -47,20 +47,19 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
     
       # we want to sum up the profit (1 to i) of the whole trading, we use this profit to compare with our profit target 
       # which is params$profit_target =50000 (we set this by ourselevs)
-      profit <- sapply(info$netWorth[i], sum, simplify = TRUE) 
+      
+      #profit <- sapply(info$netWorth[i], sum, simplify = TRUE) 
       
       # profit < profit target, we will contiune this strategy and this "if" command
       if (profit < params$profit_target) {
           next
-      }
-      # profit >= params$profit_target, we will exit the market and stop trading
-        else
+      } else               # profit >= params$profit_target, we will exit the market and stop trading
           pos[params$series[i]] <- 0  #update current position
-          break
-      }
-
+          break                       # exit
+    }
   }
-
+  sub_profit <- sum(sapply(info, function(x) x$netWorth))  
+  print(sub_profit)
   marketOrders <- marketOrders + pos
   
   return(list(store=store,marketOrders=marketOrders,
