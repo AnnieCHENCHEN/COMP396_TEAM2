@@ -1,14 +1,14 @@
-source('framework/data.R'); 
-source('framework/backtester.R')
-source('framework/processResults.R'); 
-source('framework/utilities.R'); # for backtestAndPlot function
+source('C:/Users/13708/Desktop/COMP396fyp/COMP396_TEAM2/data.R'); 
+source('C:/Users/13708/Desktop/COMP396fyp/COMP396_TEAM2/backtester.R')
+source('C:/Users/13708/Desktop/COMP396fyp/COMP396_TEAM2/processResults.R'); 
+source('C:/Users/13708/Desktop/COMP396fyp/COMP396_TEAM2/utilities.R'); # for backtestAndPlot function
 source('example_strategies.R');
 
 # load data
 dataList <- getData(directory="PART1")
 
 # choose strategy from example_strategies
-strategy <- "fixed"
+strategy <- "meanReversion"
           
 # check that the choice is valid
 is_valid_example_strategy <- function(strategy) { 
@@ -34,3 +34,4 @@ sMult <- 0.20 # slippage multiplier
 
 results <- backtest(dataList,getOrders,params,sMult)
 pfolioPnL <- plotResults(dataList,results,plotType='ggplot2')
+
