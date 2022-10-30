@@ -1,10 +1,9 @@
-# Momentum strategy (with BBands with proit target)
+# Momentum strategy (with TMA with stop loss)
 # This strategy uses only marker order
 
 getOrders <- function(store, newRowList, currentPos, info, params) {
   allzero  <- rep(0,length(newRowList)) # used for initializing vectors
   pos <- allzero
-  stop_loss =0 #set stop loss=0
   
   if (is.null(store)) 
     store <- initStore(newRowList)  
@@ -20,30 +19,37 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         pos[i] <- getPosSignFromTMA(TMA_List) * getPosSize(CurrentClose)
       
       #traling stop loss
-      #stop loss = 20, 涨到320�? �?300时退出。超过设定的跌幅，就不进行交�?
-      #买，原close price + trailing stop loss (100) = current close price（交易价格）
-      # 下一次交易的close rice <= current close price（交易价格），就退�?(pos <-0),否则就继续交�?
+      #stop loss = 10% (we should explain why we set this number)
+      #highest price = max(close price)(from day 1 to day i); lowest price = min(close price)(from day 1 to day i)
+      #max stop loss price = (1-0.1) * highest price
+      #min stop loss price = (1+0.1) * lowest price
+        
+      # long trade  
       if (pos[i] ==1){
         highestPrice = max(store$cl[[1:i]])
         maxStopLoss_price = (1-0.1) * highestPrice
         
-        if (store$cl[[i]] <= maxStopLoss_price){ #
-          pos[i] <- 0
+        if (store$cl[[i]] <= maxStopLoss_price){ 
+          pos[i] <- 0 #exit market
+          
           }else{ #store$cl[[i]] > maxStopLoss_price
-            next #
+            
+            next # stay in a trade (we don't know how to write this part)
           }
         
       }
         
-      else if (pos[i] == -1){
+        # short trade  
+      else if (pos[i] == -1){ 
         lowestPrice = min(store$cl[[1:i]])
         minStopLoss_price = (1+0.1) * lowestPrice
         
-        if (store$cl[[i]] >= minStopLoss_price){ #
-          pos[i] <- 0
-          print("hello")
+        if (store$cl[[i]] >= minStopLoss_price){ 
+          pos[i] <- 0 #exit market
+          
         }else{ #store$cl[[i]] < minStopLoss_price
-          next #
+          
+          next # stay in a trade (we don't know how to write this part)
         } 
       
         
@@ -83,6 +89,7 @@ getPosSignFromTMA <- function(tma_list) {
     return(0)
 }
 
+#question! we don't know how to set position size
 getPosSize <- function(current_close,constant=5000) { 
   RoundDown_int <- floor(constant/current_close)
   return(RoundDown_int)

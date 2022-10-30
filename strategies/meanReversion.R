@@ -40,7 +40,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       
       #Profit target计算
       #lower_bound = cl*1.2
-      #upper_bound = 前10天的历史数据
+      #upper_bound = 前10天的历史数据(close price)
       #profit_target = lower_bound + ((upper_bound - lower_bound)/2)
       
       #sub_profit <- sum(sapply(info, function(x) x$netWorth)) #报错
@@ -59,7 +59,6 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
 
   marketOrders <- marketOrders + pos
   
-  print(info$netWorth[1][1])
   return(list(store=store,marketOrders=marketOrders,
               limitOrders1=allzero,limitPrices1=allzero,
               limitOrders2=allzero,limitPrices2=allzero))

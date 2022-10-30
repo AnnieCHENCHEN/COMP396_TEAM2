@@ -1,14 +1,14 @@
-source('C:/Users/13708/Desktop/COMP396fyp/COMP396_TEAM2/data.R'); 
-source('C:/Users/13708/Desktop/COMP396fyp/COMP396_TEAM2/backtester.R')
-source('C:/Users/13708/Desktop/COMP396fyp/COMP396_TEAM2/processResults.R'); 
-source('C:/Users/13708/Desktop/COMP396fyp/COMP396_TEAM2/utilities.R'); # for backtestAndPlot function
+source('C:/Users/13708/Desktop/COMP396fyp/COMP396_TEAM2/framework/data.R'); 
+source('C:/Users/13708/Desktop/COMP396fyp/COMP396_TEAM2/framework/backtester.R')
+source('C:/Users/13708/Desktop/COMP396fyp/COMP396_TEAM2/framework/processResults.R'); 
+source('C:/Users/13708/Desktop/COMP396fyp/COMP396_TEAM2/framework/utilities.R'); # for backtestAndPlot function
 source('example_strategies.R');
 
 # load data
 dataList <- getData(directory="PART1")
 
 # choose strategy from example_strategies
-strategy <- "meanReversion"
+strategy <- "momentum"
           
 # check that the choice is valid
 is_valid_example_strategy <- function(strategy) { 
