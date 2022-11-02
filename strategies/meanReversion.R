@@ -41,20 +41,21 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       #Profit target计算
       #lower_bound = cl*1.2
       #upper_bound = 前10天的历史数据(close price)
-      #profit_target = lower_bound + ((upper_bound - lower_bound)/2)
+    #profit_target = lower_bound + ((upper_bound - lower_bound)/2)
       
       #sub_profit <- sum(sapply(info, function(x) x$netWorth)) #报错
       
       # profit < profit target, we will contiune this strategy and this "if" command
-      if (sub_profit < params$profit_target) {
-          next
-      }
+      #if (sub_profit < params$profit_target) {
+      #    next
+      #}
       # profit >= params$profit_target, we will exit the market and stop trading
-        else
-          pos[params$series[i]] <- 0  #update current position
-          break
-    }
+       # else
+       #   pos[params$series[i]] <- 0  #update current position
+       #   break
+    #}
 
+    }
   }
 
   marketOrders <- marketOrders + pos
@@ -65,6 +66,20 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
 
 }
 
+getPositionSizing <- function (cl,params){
+  
+  closeDiffs <- lapply(cl, diff)
+  
+  absCloseDiffs    <- lapply(closeDiffs,abs)
+  avgAbsDiffs <- sapply(absCloseDiffs,mean,na.rm=TRUE)
+  
+  largestAvgAbsDiffs <- max(avgAbsDiffs)
+  positionSizes <- round(largestAvgAbsDiffs/avgAbsDiffs)
+  params<- list(sizes=positionSizes) # inversely proportional to average abs diff
+  
+  return(params)
+  
+}
 
 initClStore  <- function(newRowList,series) {
   clStore <- matrix(0,nrow=maxRows,ncol=length(series))
