@@ -2,6 +2,7 @@
 # The strategy will be long (short) whenever 
 # the close is below (above) lower (upper) Bollinger Band.
 # Thus this is contrarian (a.k.a. mean-reversion) type strategy.
+# data 10
 
 maxRows <- 3100 # used to initialize a matrix to store closing prices
 # set maxRows as the number of rows in data (it can be larger but should not be smaller)
@@ -18,13 +19,11 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
 	
     marketOrders <- -currentPos #
     pos <- allzero
-    profit <- 0
 
     if (store$iter > params$lookback) {
        startIndex <-  store$iter - params$lookback #
        for (i in 1:length(params$series)) {
            cl <- newRowList[[params$series[i]]]$Close
-           vl <- newRowList[[params$series[i]]]$Volume
            
            bbands <- last(BBands(store$cl[startIndex:store$iter,i],
                                       n=params$lookback,sd=params$sdParam))

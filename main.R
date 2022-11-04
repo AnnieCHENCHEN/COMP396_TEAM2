@@ -8,7 +8,7 @@ source('example_strategies.R');
 dataList <- getData(directory="PART1")
 
 # choose strategy from example_strategies
-strategy <- "meanReversion"
+strategy <- "bbands_contrarian"
           
 # check that the choice is valid
 is_valid_example_strategy <- function(strategy) { 
@@ -20,18 +20,19 @@ stopifnot(is_valid_example_strategy(strategy))
 load_strategy(strategy) # function from example_strategies.R
 
 # split data in two (e.g. for in/out test)
-#numDays <- nrow(dataList[[1]])
-#inSampDays <- 550
+numDays <- nrow(dataList[[2]])
+inSampDays <- 550
+print(numDays)
+
 
 # in-sample period
-#dataList <- lapply(dataList, function(x) x[1:inSampDays])
+dataList <- lapply(dataList, function(x) x[1:inSampDays])
 
 # out-of-sample period
-#dataList <- lapply(dataList, function(x) 
-                               #x[(inSampDays+1):numDays])
+dataList <- lapply(dataList, function(x) x[(inSampDays+1):numDays])
 
 sMult <- 0.20 # slippage multiplier
 
 results <- backtest(dataList,getOrders,params,sMult)
-#pfolioPnL <- plotResults(dataList,results,plotType='ggplot2')
+pfolioPnL <- plotResults(dataList,results,plotType='ggplot2')
 

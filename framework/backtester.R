@@ -331,7 +331,6 @@ backtest <- function(dataList, getOrders, params, sMult) {
 
         balance <- balance - moneySpent
         netWorth <-  newNetWorth + balance
-        print(unlist(balance))
 
 
         if(netWorth < 0)

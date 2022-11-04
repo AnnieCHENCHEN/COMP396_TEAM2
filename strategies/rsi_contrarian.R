@@ -59,6 +59,7 @@
 
 maxRows <- 3100 # used to initialize a matrix to store closing prices
 # set maxRows as the number of rows in data (it can be larger but should not be smaller)
+#data 10
 
 getOrders <- function(store, newRowList, currentPos, info, params) {
 
