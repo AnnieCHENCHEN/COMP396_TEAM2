@@ -5,29 +5,34 @@ library(quantmod)
 source(file.path("framework","data.R"))
 
 dataList <- getData(directory="PART1") 
-d3 <- dataList[[10]][1:500,]
+d3 <- dataList[[10]][1:1100,]
 
-condPr_rsi <- matrix(0,nrow=nrow(d3)-21,ncol=3)
+condPr_rsi <- matrix(0,nrow=nrow(d3)-lookback-1,ncol=3)
 colnames(condPr_rsi) <- c("P(up)","P(down)","p(flat)")
 
-lookback = 20
+lookback = 10
 threshold = 10
+tradDays <-  0
 
-for (i in 22:nrow(d3)){
+for (i in (lookback+2):nrow(d3)){
   start_Index <- i- lookback-1 #need 2 period
-  rsi <- last(RSI(d3[start_Index:i, 4], n=20))
+  rsi <- last(RSI(d3[start_Index:i, 4], n=lookback))
   
   if (rsi > (50 + 10)){
     condPr_rsi[start_Index,1] <- 1 # short
+    tradDays <- tradDays+1
   }
 
   else if (rsi < (50 - 10)){
     condPr_rsi[start_Index,2] <- 1
+    tradDays <- tradDays+1
     
   }else{
     condPr_rsi[start_Index,3] <- 1
+
   }
 }
+print(tradDays)
 
 len <-  nrow(condPr_rsi)
 
