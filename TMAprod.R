@@ -4,7 +4,7 @@ library(quantmod)
 source(file.path("framework","data.R"))
 
 dataList <- getData(directory="PART1") 
-d2 <- dataList[[10]][1:500,]
+d2 <- dataList[[10]][1:1100,]
 
 condPr_TMA <- matrix(0,nrow=nrow(d2),ncol=2)
 colnames(condPr_TMA) <- c("P(long)","P(short)")
@@ -12,7 +12,7 @@ colnames(condPr_TMA) <- c("P(long)","P(short)")
 sma_short <- rep(0,nrow(condPr_TMA))
 sma_med <- rep(0,nrow(condPr_TMA))
 sma_long <- rep(0,nrow(condPr_TMA))
-
+tradDays <-  0
 #ret = list(short = 0, medium = 0, long = 0)
 #lookback <- c("short" = 10, "medium" = 60, "long" = 150)
 
@@ -33,13 +33,16 @@ for (i in 6: nrow(condPr_TMA)) {
   
     if (sma_short[i] >sma_med[i] && sma_med[i] > sma_long[i]){ #long
       condPr_TMA[i,1] <- 1 #long
+      tradDays <- tradDays+1
     
      }else if (sma_short[i]<sma_med[i] && sma_med[i] < sma_long[i]){ #short
        condPr_TMA[i,2] <- 1 #short
+       tradDays <- tradDays+1
      }
   }
     
 }
+print(tradDays)
 
 len <-  nrow(condPr_TMA)-20
 
