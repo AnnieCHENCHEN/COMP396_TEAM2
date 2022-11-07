@@ -272,6 +272,7 @@ backtest <- function(dataList, getOrders, params, sMult) {
         x <- getOrders(store, getRowList(dataList,i-1), oldPosList, info, params)
 
         store            <- x$store
+        #browser()
 
         if (length(x$marketOrders) != numOfSeries) {
             cat("Error: length(marketOrders) != numOfSeries\n"); 
@@ -320,7 +321,7 @@ backtest <- function(dataList, getOrders, params, sMult) {
         # cancel all trades for today
         if(moneySpent > balance)
         {
-            cat("Warning: attempted to spend £", moneySpent, " but only £", balance, " available. No trades executed today\n")
+            cat("Warning: attempted to spend 拢", moneySpent, " but only 拢", balance, " available. No trades executed today\n")
 
             pnlRow <- lapply(tradeResults, function(x) x$basePnl)
             newPosList <- oldPosList
@@ -368,6 +369,8 @@ backtest <- function(dataList, getOrders, params, sMult) {
         netWorthList[[i]] <- netWorth
 
     }
+    
+    
 
     #cat("FINAL DAY: INVENTORY", newPosList, "\n")
 
@@ -384,7 +387,32 @@ backtest <- function(dataList, getOrders, params, sMult) {
         finalNetWorth <- sum(sapply(exit, function(x) x$netWorth)) + balance
         netWorthList[[numOfDays]] <- finalNetWorth
     }
+    
+   
+   # tradeDay1 <- 848 #mean Reversion
+    #tradeDay2 <- 711 #TMA
+    #tradeDay3 <- 699 #RSI
+    
+   # total_return <- 0
+   # winningDay <- 0
+   # lossDay <- 0
+   # profitable <- 0
+    
+   # for (m in 1: (length(netWorthList)-1)){
+    #  if (netWorthList[[m]] != netWorthList[[m+1]]) {
+     #   if ( as.numeric(netWorthList[[m]]) >= 1000000){
+      #    winningDay <- winningDay+1
+      #  }else{
+      #    lossDay <- lossDay+1
+      #  }
+        
+     # } 
+   # }
+   # profitable <- winningDay/tradeDay3
+  #  total_return <- balance-1000000
 
+   # print(profitable)
+   # print(total_return)
 
     # END OF TRADING
     #############################################
