@@ -1,45 +1,59 @@
 source('framework/data.R'); 
 source('framework/backtester.R')
 source('framework/processResults.R'); 
-source('strategies/momentum.R') 
+source('strategies/momentum.R')
 
+#training dyas = 500  validation days = 250  testing days = 250
+#split data into 3 parts
 training_days <- 500  
 validation_days <- 250  
 testing_days <- 250
-# training dyas = 500  validation days = 250  testing days = 250
-#split data into 3 parts
+##########################################################################
+#training days
 numOfDays <- training_days  
 dataList <- getData(directory="PART1")
 dataList <- lapply(dataList, function(x) x[1:numOfDays])
+########################################################################
+#validation 
+# StartDay <- training_days+1
+# EndDay <- training_days+250
+# dataList <- getData(directory="PART1")
+# dataList <- lapply(dataList, function(x) x[StartDay:EndDay])
+#######################################################################
+#test
+# StartDay <- 751
+# EndDay <- validation_days+250
+# dataList <- getData(directory="PART1")
+# dataList <- lapply(dataList, function(x) x[StartDay:EndDay])
+######################################################################
 sMult <- 0.2 # slippage multiplier
-
+sdParam <- 1.5
 params_short <- c(5,10)
 params_medium <- c(30,50)
-params_long <- c(70,100)
-params_series <- list(c(1,2),c(1,3), c(1,4),c(2,3),c(2,4),c(3,4),
-                      c(1,2,3),c(1,2,4),c(1,3,4),c(2,3,4),c(1,2,3,4))
+params_long <- c(90,100)
+# params_series <- list(c(1,2),c(1,3), c(1,4),c(2,3),c(2,4),c(3,4),
+#                       c(1,2,3),c(1,2,4),c(1,3,4),c(2,3,4),c(1,2,3,4))
 params_comb <- expand.grid(short=params_short,medium=params_medium,
-                           long=params_long,series=params_series)
+                           long=params_long)
 
-sdParamSeq  <- seq(from=1.5,to=2,by=0.5) 
-paramsList  <- list(lookbackSeq,sdParamSeq)
-numberComb <- prod(sapply(paramsList,length))
+resultsMatrix <- matrix(nrow=nrow(params_comb),ncol=4)
+colnames(resultsMatrix) <- c("short","medium","long","PD Ratio")
+# pfolioPnLList <- vector(mode="list",length=nrow(params_comb)) 
 
-resultsMatrix <- matrix(nrow=numberComb,ncol=3)
-colnames(resultsMatrix) <- c("lookback","sdParam","PD Ratio")
-pfolioPnLList <- vector(mode="list",length=numberComb)
-
-count <- 1
-for (lb in lookbackSeq) {
-  for (sdp in sdParamSeq) {
-    params <- list(lookback=lb,sdParam=sdp,series=1:4,posSizes=rep(1,10)) 
-    results <- backtest(dataList, getOrders, params, sMult)
-    pfolioPnL <- plotResults(dataList,results)
-    resultsMatrix[count,] <- c(lb,sdp,pfolioPnL$fitAgg)
-    pfolioPnLList[[count]]<- pfolioPnL
-    cat("Just completed",count,"out of",numberComb,"\n")
-    print(resultsMatrix[count,])
-    count <- count + 1
-  }
+for(i in 1:nrow(params_comb)){
+  params$series <- 1:5
+  params$lookbacks <- list(short=params_comb$short[[i]], medium=params_comb$medium[[i]],
+                           long=params_comb$long[[i]])
+  params$sdParam <- sdParam
+  # Do backtest
+  results <- backtest(dataList,getOrders,params,sMult)
+  pfolioPnL <- plotResults(dataList,results)
+  # pfolioPnLList[[i]]<- pfolioPnL
+  resultsMatrix[i,] <- c(params_comb$short[[i]],params_comb$medium[[i]],
+                         params_comb$long[[i]],pfolioPnL$fitAgg)
+  cat("Just completed",i,"out of",nrow(params_comb),"\n")
+  print(resultsMatrix[i,])
 }
 print(resultsMatrix[order(resultsMatrix[,"PD Ratio"]),])
+
+
