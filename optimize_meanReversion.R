@@ -3,14 +3,29 @@ source('framework/backtester.R')
 source('framework/processResults.R'); 
 source('strategies/meanReversion.R') 
 
+#training dyas = 500  validation days = 250  testing days = 250
+#split data into 3 parts
 training_days <- 500  
 validation_days <- 250  
 testing_days <- 250
-# training dyas = 500  validation days = 250  testing days = 250
-#split data into 3 parts
-numOfDays <- training_days
+##########################################################################
+#training days
+numOfDays <- training_days  
 dataList <- getData(directory="PART1")
 dataList <- lapply(dataList, function(x) x[1:numOfDays])
+########################################################################
+#validation 
+# StartDay <- training_days+1
+# EndDay <- training_days+250
+# dataList <- getData(directory="PART1")
+# dataList <- lapply(dataList, function(x) x[StartDay:EndDay])
+#######################################################################
+#test
+# StartDay <- 751
+# EndDay <- validation_days+250
+# dataList <- getData(directory="PART1")
+# dataList <- lapply(dataList, function(x) x[StartDay:EndDay])
+######################################################################
 sMult <- 0.2 # slippage multiplier
 
 lookbackSeq <- seq(from=20,to=40,by=10)
