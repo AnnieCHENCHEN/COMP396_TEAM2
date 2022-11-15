@@ -27,7 +27,7 @@ dataList <- lapply(dataList, function(x) x[1:numOfDays])
 # dataList <- lapply(dataList, function(x) x[StartDay:EndDay])
 ######################################################################
 sMult <- 0.2 # slippage multiplier
-sdParam <- seq(from=0.5,to=2,by=0.5) 
+sdParam <- c(0.5,1.5,2) 
 params_short <- c(5,10,15)
 params_medium <- c(30,50,70)
 params_long <- c(90,100,110)
@@ -55,6 +55,7 @@ for(i in 1:nrow(params_comb)){
   print(resultsMatrix[i,])
 }
 print(resultsMatrix[order(resultsMatrix[,"PD Ratio"]),])
+
 
 
 
