@@ -28,29 +28,27 @@ dataList <- lapply(dataList, function(x) x[1:numOfDays])
 ######################################################################
 sMult <- 0.2 # slippage multiplier
 
-lookbackSeq <- seq(from=20,to=40,by=10)
-sdParamSeq  <- seq(from=1.5,to=2,by=0.5) 
-paramsList  <- list(lookbackSeq,sdParamSeq)
-numberComb <- prod(sapply(paramsList,length))
+lookbackSeq <- c(5,15,25,35,45,55,65,75,85)
+sdParam <- c(0.5,1,1.5,2)
+P_size <- list(c(136,4860,11,123,21,21066,1,1652,6,95),
+                c(811,28972,66,733,125,125581,6,9848,36,566))
 
-print(numberComb)
+params_comb <- expand.grid(lookback=lookbackSeq,sd=sdParam, pSize=P_size)
 
-resultsMatrix <- matrix(nrow=numberComb,ncol=3)
-colnames(resultsMatrix) <- c("lookback","sdParam","PD Ratio")
-pfolioPnLList <- vector(mode="list",length=numberComb)
+resultsMatrix <- matrix(nrow=nrow(params_comb),ncol=4)
+colnames(resultsMatrix) <- c("lookback","sdParam","posSize","PD Ratio")
+pfolioPnLList <- vector(mode="list",length=nrow(params_comb)) 
+print(nrow(params_comb))
 
-count <- 1
-for (lb in lookbackSeq) {
-  for (sdp in sdParamSeq) {
-    params <- list(lookback=lb,sdParam=sdp,series=1:5,posSizes=rep(1,10)) 
+for (i in 1:nrow(params_comb)) {
+    params <- list(lookback=params_comb$lookback[[i]],sdParam=params_comb$sd[[i]],
+                   series=1:10,posSizes=params_comb$pSize[[i]]) 
     results <- backtest(dataList, getOrders, params, sMult)
     pfolioPnL <- plotResults(dataList,results)
-    resultsMatrix[count,] <- c(lb,sdp,pfolioPnL$fitAgg)
-    pfolioPnLList[[count]]<- pfolioPnL
-    cat("Just completed",count,"out of",numberComb,"\n")
-    print(resultsMatrix[count,])
-    count <- count + 1
-  }
+    resultsMatrix[i,] <- c(params_comb$lookback[[i]],params_comb$sd[[i]],
+                               params_comb$pSize[[i]],pfolioPnL$fitAgg)
+    pfolioPnLList[[i]]<- pfolioPnL
+    cat("Just completed",i,"out of",nrow(params_comb),"\n")
+    print(resultsMatrix[i,])
 }
 print(resultsMatrix[order(resultsMatrix[,"PD Ratio"]),])
-
