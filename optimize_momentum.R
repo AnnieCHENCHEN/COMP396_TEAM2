@@ -27,30 +27,50 @@ dataList <- lapply(dataList, function(x) x[1:numOfDays])
 # dataList <- lapply(dataList, function(x) x[StartDay:EndDay])
 ######################################################################
 sMult <- 0.2 # slippage multiplier
-sdParam <- c(0.5,1.5,2) 
+sdParam <- c(0.5,1,1.5,2)
 params_short <- c(5,10,15)
-params_medium <- c(30,50,70)
-params_long <- c(90,100,110)
+params_medium <- c(30,50,60)
+params_long <- c(80,90,100)
+P_size <- list(c(136,4860,11,123,21,21066,1,1652,6,95),
+               c(811,28972,66,733,125,125581,6,9848,36,566),
+               c(136,4773,11,124,22,20754,1,1674,7,90),
+               c(272,9541,22,248,44,41488,2,3346,14,180))
 # params_series <- list(c(1,2),c(1,3), c(1,4),c(2,3),c(2,4),c(3,4),
 #                       c(1,2,3),c(1,2,4),c(1,3,4),c(2,3,4),c(1,2,3,4))
 params_comb <- expand.grid(short=params_short,medium=params_medium,
-                           long=params_long, sd=sdParam)
-resultsMatrix <- matrix(nrow=nrow(params_comb),ncol=5)
-colnames(resultsMatrix) <- c("short","medium","long","sdParam","PD Ratio")
-# pfolioPnLList <- vector(mode="list",length=nrow(params_comb)) 
-
+                           long=params_long,sd=sdParam, pSize=P_size)
+resultsMatrix <- matrix(nrow=nrow(params_comb),ncol=6)
+colnames(resultsMatrix) <- c("short","medium","long","sdParam","posSize","PD Ratio")
+pfolioPnLList <- vector(mode="list",length=nrow(params_comb)) 
+print(nrow(params_comb))
 for(i in 1:nrow(params_comb)){
   
   params$series <- 1:10
-  params$lookback <- list(short=params_comb$short[[i]], medium=params_comb$medium[[i]],
+  params$lookbacks <- list(short=params_comb$short[[i]], medium=params_comb$medium[[i]],
                            long=params_comb$long[[i]])
   params$sdParam <- params_comb$sd[[i]]
+  params$posSizes <- params_comb$pSize[[i]]
   # Do backtest
   results <- backtest(dataList,getOrders,params,sMult)
   pfolioPnL <- plotResults(dataList,results)
-  # pfolioPnLList[[i]]<- pfolioPnL
-  resultsMatrix[i,] <- c(params_comb$short[[i]],params_comb$medium[[i]],
-                         params_comb$long[[i]],params_comb$sd[[i]],pfolioPnL$fitAgg)
+  pfolioPnLList[[i]]<- pfolioPnL
+  if(params_comb$pSize[[i]] == c(136,4860,11,123,21,21066,1,1652,6,95)){
+    resultsMatrix[i,] <- c(params_comb$short[[i]],params_comb$medium[[i]],
+                           params_comb$long[[i]],params_comb$sd[[i]],
+                           "close_AADS",pfolioPnL$fitAgg)
+  }else if(params_comb$pSize[[i]] == c(811,28972,66,733,125,125581,6,9848,36,566)){
+    resultsMatrix[i,] <- c(params_comb$short[[i]],params_comb$medium[[i]],
+                           params_comb$long[[i]],params_comb$sd[[i]],
+                           "close_ST",pfolioPnL$fitAgg)
+  }else if(params_comb$pSize[[i]] == c(136,4773,11,124,22,20754,1,1674,7,90)){
+    resultsMatrix[i,] <- c(params_comb$short[[i]],params_comb$medium[[i]],
+                           params_comb$long[[i]],params_comb$sd[[i]],
+                           "open_AADS",pfolioPnL$fitAgg)
+  }else{
+    resultsMatrix[i,] <- c(params_comb$short[[i]],params_comb$medium[[i]],
+                           params_comb$long[[i]],params_comb$sd[[i]],
+                           "open_ST",pfolioPnL$fitAgg)
+  }
   cat("Just completed",i,"out of",nrow(params_comb),"\n")
   print(resultsMatrix[i,])
 }
