@@ -7,7 +7,7 @@ source('strategies/momentum.R')
 #split data into 3 parts
 training_days <- 500  
 validation_days <- 250  
-testing_days <- 250
+testing_days <- 350
 ##########################################################################
 #training days
 numOfDays <- training_days  
@@ -22,21 +22,18 @@ dataList <- lapply(dataList, function(x) x[1:numOfDays])
 #######################################################################
 #test
 # StartDay <- 751
-# EndDay <- validation_days+250
+# EndDay <- validation_days+350
 # dataList <- getData(directory="PART1")
 # dataList <- lapply(dataList, function(x) x[StartDay:EndDay])
 ######################################################################
 sMult <- 0.2 # slippage multiplier
-sdParam <- c(0.5,1,1.5,2)
+sdParam <- c(1,1.5,2)
 params_short <- c(5,10,15)
 params_medium <- c(30,50,60)
 params_long <- c(80,90,100)
 P_size <- list(c(136,4860,11,123,21,21066,1,1652,6,95),
-               c(811,28972,66,733,125,125581,6,9848,36,566),
-               c(136,4773,11,124,22,20754,1,1674,7,90),
-               c(272,9541,22,248,44,41488,2,3346,14,180))
-# params_series <- list(c(1,2),c(1,3), c(1,4),c(2,3),c(2,4),c(3,4),
-#                       c(1,2,3),c(1,2,4),c(1,3,4),c(2,3,4),c(1,2,3,4))
+               c(811,28972,66,733,125,125581,6,9848,36,566))
+
 params_comb <- expand.grid(short=params_short,medium=params_medium,
                            long=params_long,sd=sdParam, pSize=P_size)
 resultsMatrix <- matrix(nrow=nrow(params_comb),ncol=6)
@@ -54,27 +51,20 @@ for(i in 1:nrow(params_comb)){
   results <- backtest(dataList,getOrders,params,sMult)
   pfolioPnL <- plotResults(dataList,results)
   pfolioPnLList[[i]]<- pfolioPnL
-  if(params_comb$pSize[[i]] == c(136,4860,11,123,21,21066,1,1652,6,95)){
+  if(params_comb$pSize[[i]] == P_size[[1]]){
     resultsMatrix[i,] <- c(params_comb$short[[i]],params_comb$medium[[i]],
                            params_comb$long[[i]],params_comb$sd[[i]],
                            "close_AADS",pfolioPnL$fitAgg)
-  }else if(params_comb$pSize[[i]] == c(811,28972,66,733,125,125581,6,9848,36,566)){
+  }
+  if(params_comb$pSize[[i]] == P_size[[2]]){
     resultsMatrix[i,] <- c(params_comb$short[[i]],params_comb$medium[[i]],
                            params_comb$long[[i]],params_comb$sd[[i]],
                            "close_ST",pfolioPnL$fitAgg)
-  }else if(params_comb$pSize[[i]] == c(136,4773,11,124,22,20754,1,1674,7,90)){
-    resultsMatrix[i,] <- c(params_comb$short[[i]],params_comb$medium[[i]],
-                           params_comb$long[[i]],params_comb$sd[[i]],
-                           "open_AADS",pfolioPnL$fitAgg)
-  }else{
-    resultsMatrix[i,] <- c(params_comb$short[[i]],params_comb$medium[[i]],
-                           params_comb$long[[i]],params_comb$sd[[i]],
-                           "open_ST",pfolioPnL$fitAgg)
   }
   cat("Just completed",i,"out of",nrow(params_comb),"\n")
   print(resultsMatrix[i,])
 }
-print(resultsMatrix[order(resultsMatrix[,"PD Ratio"]),])
+print(resultsMatrix[order(resultsMatrix[,"PD Ratio"],decreasing = TRUE),])
 
 
 
