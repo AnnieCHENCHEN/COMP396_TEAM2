@@ -28,10 +28,12 @@ dataList <- lapply(dataList, function(x) x[1:numOfDays])
 ######################################################################
 sMult <- 0.2 # slippage multiplier
 
-lookbackSeq <- c(5,15,25,35,45,55,65,75,85)
+lookbackSeq <- c(5,15,25,35,45,55,65,75,85,95,105,115)
 sdParam <- c(0.5,1,1.5,2)
 P_size <- list(c(136,4860,11,123,21,21066,1,1652,6,95),
-                c(811,28972,66,733,125,125581,6,9848,36,566))
+               c(811,28972,66,733,125,125581,6,9848,36,566),
+               c(136,4773,11,124,22,20754,1,1674,7,90),
+               c(272,9541,22,248,44,41488,2,3346,14,180))
 
 params_comb <- expand.grid(lookback=lookbackSeq,sd=sdParam, pSize=P_size)
 
@@ -45,8 +47,19 @@ for (i in 1:nrow(params_comb)) {
                    series=1:10,posSizes=params_comb$pSize[[i]]) 
     results <- backtest(dataList, getOrders, params, sMult)
     pfolioPnL <- plotResults(dataList,results)
-    resultsMatrix[i,] <- c(params_comb$lookback[[i]],params_comb$sd[[i]],
-                               params_comb$pSize[[i]],pfolioPnL$fitAgg)
+    if(params_comb$pSize[[i]] == c(136,4860,11,123,21,21066,1,1652,6,95)){
+      resultsMatrix[i,] <- c(params_comb$lookback[[i]],params_comb$sd[[i]],
+                             "close_AADS",pfolioPnL$fitAgg)
+    }else if(params_comb$pSize[[i]] == c(811,28972,66,733,125,125581,6,9848,36,566)){
+      resultsMatrix[i,] <- c(params_comb$lookback[[i]],params_comb$sd[[i]],
+                             "close_ST",pfolioPnL$fitAgg)
+    }else if(params_comb$pSize[[i]] == c(136,4773,11,124,22,20754,1,1674,7,90)){
+      resultsMatrix[i,] <- c(params_comb$lookback[[i]],params_comb$sd[[i]],
+                             "open_AADS",pfolioPnL$fitAgg)
+    }else{
+      resultsMatrix[i,] <- c(params_comb$lookback[[i]],params_comb$sd[[i]],
+                             "open_ST",pfolioPnL$fitAgg)
+    }
     pfolioPnLList[[i]]<- pfolioPnL
     cat("Just completed",i,"out of",nrow(params_comb),"\n")
     print(resultsMatrix[i,])
