@@ -29,29 +29,40 @@ dataList <- lapply(dataList, function(x) x[1:numOfDays])
 
 sMult <- 0.2 # slippage multiplier
 #sMult <- 0
-lookbackSeq <- seq(from=10,to=70,by=10)
-threshold  <- seq(from=5,to=20,by=5) 
-paramsList  <- list(lookbackSeq,threshold)
-numberComb <- prod(sapply(paramsList,length))
+lookbackSeq <- c(5,15,25,35,45,55,65,75,85,95,105,115,125)
+threshold <- c(5,10,14,15,20)
+P_size <- list(c(136,4860,11,123,21,21066,1,1652,6,95),
+               c(811,28972,66,733,125,125581,6,9848,36,566),
+               c(136,4773,11,124,22,20754,1,1674,7,90),
+               c(272,9541,22,248,44,41488,2,3346,14,180))
 
-print(numberComb)
+params_comb <- expand.grid(lookback=lookbackSeq,threshold=threshold, pSize=P_size)
 
-resultsMatrix <- matrix(nrow=numberComb,ncol=3)
-colnames(resultsMatrix) <- c("lookback","threshold","PD Ratio")
-pfolioPnLList <- vector(mode="list",length=numberComb)
+resultsMatrix <- matrix(nrow=nrow(params_comb),ncol=4)
+colnames(resultsMatrix) <- c("lookback","threshold","posSize","PD Ratio")
+pfolioPnLList <- vector(mode="list",length=nrow(params_comb)) 
+print(nrow(params_comb))
 
-count <- 1
-for (lb in lookbackSeq) {
-  for (n in threshold) {
-    params <- list(lookback=lb,threshold=n,series=,posSizes=rep(1,10)) 
-    results <- backtest(dataList, getOrders, params, sMult)
-    pfolioPnL <- plotResults(dataList,results)
-    resultsMatrix[count,] <- c(lb,n,pfolioPnL$fitAgg)
-    pfolioPnLList[[count]]<- pfolioPnL
-    cat("Just completed",count,"out of",numberComb,"\n")
-    print(resultsMatrix[count,])
-    count <- count + 1
+for (i in 1:nrow(params_comb)) {
+  params <- list(lookback=params_comb$lookback[[i]],threshold=params_comb$threshold[[i]],
+                 series=1:10,posSizes=params_comb$pSize[[i]]) 
+  results <- backtest(dataList, getOrders, params, sMult)
+  pfolioPnL <- plotResults(dataList,results)
+  if(params_comb$pSize[[i]] == c(136,4860,11,123,21,21066,1,1652,6,95)){
+    resultsMatrix[i,] <- c(params_comb$lookback[[i]],params_comb$threshold[[i]],
+                           "close_AADS",pfolioPnL$fitAgg)
+  }else if(params_comb$pSize[[i]] == c(811,28972,66,733,125,125581,6,9848,36,566)){
+    resultsMatrix[i,] <- c(params_comb$lookback[[i]],params_comb$threshold[[i]],
+                           "close_ST",pfolioPnL$fitAgg)
+  }else if(params_comb$pSize[[i]] == c(136,4773,11,124,22,20754,1,1674,7,90)){
+    resultsMatrix[i,] <- c(params_comb$lookback[[i]],params_comb$threshold[[i]],
+                           "open_AADS",pfolioPnL$fitAgg)
+  }else{
+    resultsMatrix[i,] <- c(params_comb$lookback[[i]],params_comb$threshold[[i]],
+                           "open_ST",pfolioPnL$fitAgg)
   }
+  pfolioPnLList[[i]]<- pfolioPnL
+  cat("Just completed",i,"out of",nrow(params_comb),"\n")
+  print(resultsMatrix[i,])
 }
 print(resultsMatrix[order(resultsMatrix[,"PD Ratio"]),])
-
