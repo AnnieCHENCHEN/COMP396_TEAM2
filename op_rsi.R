@@ -28,8 +28,9 @@ dataList <- lapply(dataList, function(x) x[1:numOfDays])
 ######################################################################
 
 sMult <- 0.2 # slippage multiplier
-lookbackSeq <- seq(from=10,to=20,by=10)
-threshold  <- seq(from=10,to=20,by=10) 
+#sMult <- 0
+lookbackSeq <- seq(from=10,to=70,by=10)
+threshold  <- seq(from=5,to=20,by=5) 
 paramsList  <- list(lookbackSeq,threshold)
 numberComb <- prod(sapply(paramsList,length))
 
@@ -42,7 +43,7 @@ pfolioPnLList <- vector(mode="list",length=numberComb)
 count <- 1
 for (lb in lookbackSeq) {
   for (n in threshold) {
-    params <- list(lookback=lb,threshold=n,series=1:5,posSizes=rep(1,10)) 
+    params <- list(lookback=lb,threshold=n,series=,posSizes=rep(1,10)) 
     results <- backtest(dataList, getOrders, params, sMult)
     pfolioPnL <- plotResults(dataList,results)
     resultsMatrix[count,] <- c(lb,n,pfolioPnL$fitAgg)
@@ -53,3 +54,4 @@ for (lb in lookbackSeq) {
   }
 }
 print(resultsMatrix[order(resultsMatrix[,"PD Ratio"]),])
+
