@@ -76,7 +76,7 @@ largestClose <- max(closes)
 positionSizes <- round(largestClose/closes)
 PAR <- list(lookback=10,threshold=10,series=1:10,posSizes=positionSizes)
 params<- PAR# inversely proportional to starting open
-
+print(positionSizes)
 backtestAndPlot(path=path,
                 filename="inversely_prop_close",
                 main="Position sizes inversely proportional to Close")
@@ -86,21 +86,22 @@ largestAvgAbsDiffs <- max(avgAbsDiffs)
 positionSizes <- round(largestAvgAbsDiffs/avgAbsDiffs)
 PAR <- list(lookback=10,threshold=10,series=1:10,posSizes=positionSizes)
 params<- PAR # inversely proportional to average abs diff
-
+print(positionSizes)
 backtestAndPlot(path=path,
                 filename="inversely_prop_diffs",
                 main="Position sizes inversely proportional to Average Abs Diffs")
 
 
-estCostToBuy <- sum(positionSizes * closes)
+# estCostToBuy <- sum(positionSizes * closes)
+# 
+# target <- 300000 # Try to spend this much
+# multiplier <- target / estCostToBuy
+# positionSizes <- round(multiplier * positionSizes)
+# print(positionSizes)
+# PAR <- list(lookback=10,threshold=10,series=1:10,posSizes=positionSizes)
+# params<- PAR 
+# 
+# backtestAndPlot(path=path,
+#                 filename="spend_target",
+#                 main=paste0("Spending 300,000"))
 
-target <- 300000 # Try to spend this much
-multiplier <- target / estCostToBuy
-positionSizes <- round(multiplier * positionSizes)
-
-PAR <- list(lookback=10,threshold=10,series=1:10,posSizes=positionSizes)
-params<- PAR 
-
-backtestAndPlot(path=path,
-                filename="spend_target",
-                main=paste0("Spending 300,000"))
