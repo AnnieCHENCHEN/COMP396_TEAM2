@@ -18,7 +18,7 @@ source(strategyFile) # load in getOrders
 
 ################################################################
 # BACKTEST PARAMETERS
-#numOfDays <- 200 # don't use all available days to start with!
+numOfDays <- 200 # don't use all available days to start with!
 dataList  <- lapply(dataList, function(x) x[1:numOfDays])
 #dataList  <- lapply(dataList, function(x) x[(numOfDays+1):nrow(dataList[[1]])])
 
@@ -32,19 +32,15 @@ path <- paste0("lect4images/")
 
 ################################################################
 # STRATEGY PARAMETERS
-PAR <- list(lookbacks=list(short=5,medium=10,long=20),sdParam=1.5,series=1:10,posSizes=rep(1,10))
-params<- PAR # buy and hold equal positions
-
+params1 <- list(lookbacks=list(short=5,medium=10,long=20),sdParam=1.5,series=1:10,posSizes=rep(1,10))
+ # buy and hold equal positions
+params <- params1
 numOfDays <- 500 
 # dataList  <- lapply(dataList, function(x) x[(numOfDays+1):nrow(dataList[[1]])])
 dataList  <- lapply(dataList, function(x) x[1:numOfDays])
 backtestAndPlot(path=path,
                 filename="buy_and_hold_one_PART1",
                 main="Equal position sizes")
-
-# bbands
-#params<- list(lookback=10,sdParam=1.25,series=1:5,positionSizes=positionSizes) # bbands
-# Open on open differences
 
 closeDiffs <- lapply(dataList,function(x) diff(x$Close))
 
@@ -73,34 +69,34 @@ print(tab)
 
 closes <- sapply(dataList,function(x) first(x)$Close)
 largestClose <- max(closes)
-positionSizes <- round(largestClose/closes)
-PAR <- list(lookbacks=list(short=5,medium=10,long=20),sdParam=1.5,series=1:10,posSizes=positionSizes)
+p2 <- round(largestClose/closes)
+PAR <- list(lookbacks=list(short=5,medium=10,long=20),sdParam=1.5,series=1:10,posSizes=p2)
 params<- PAR# inversely proportional to starting open
-
+print(p2)
 backtestAndPlot(path=path,
                 filename="inversely_prop_close",
                 main="Position sizes inversely proportional to Close")
 
 
 largestAvgAbsDiffs <- max(avgAbsDiffs)
-positionSizes <- round(largestAvgAbsDiffs/avgAbsDiffs)
-PAR <- list(lookbacks=list(short=5,medium=10,long=20),sdParam=1.5,series=1:10,posSizes=positionSizes)
+p3 <- round(largestAvgAbsDiffs/avgAbsDiffs)
+PAR <- list(lookbacks=list(short=5,medium=10,long=20),sdParam=1.5,series=1:10,posSizes=p3)
 params<- PAR # inversely proportional to average abs diff
-
+print(p3)
 backtestAndPlot(path=path,
                 filename="inversely_prop_diffs",
                 main="Position sizes inversely proportional to Average Abs Diffs")
 
-
-estCostToBuy <- sum(positionSizes * closes)
-
-target <- 300000 # Try to spend this much
-multiplier <- target / estCostToBuy
-positionSizes <- round(multiplier * positionSizes)
-
-PAR <- list(lookbacks=list(short=5,medium=10,long=20),sdParam=1.5,series=1:10,posSizes=positionSizes)
-params<- PAR 
-
-backtestAndPlot(path=path,
-                filename="spend_target",
-                main=paste0("Spending 300,000"))
+# 
+# estCostToBuy <- sum(p3 * closes)
+# 
+# target <- 300000 # Try to spend this much
+# multiplier <- target / estCostToBuy
+# p4 <- round(multiplier * p3)
+# print(p4)
+# PAR <- list(lookbacks=list(short=5,medium=10,long=20),sdParam=1.5,series=1:10,posSizes=p4)
+# params<- PAR
+# 
+# backtestAndPlot(path=path,
+#                 filename="spend_target",
+#                 main=paste0("Spending 300,000"))
