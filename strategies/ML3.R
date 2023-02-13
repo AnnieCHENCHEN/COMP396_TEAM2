@@ -2,6 +2,7 @@
 
 library(rpart)
 library(caret)
+library(xts)
 
 maxRows <- 3100
 
@@ -13,45 +14,48 @@ getOrders <- function(store, newRowList, currentPos, info, params){
   store <- updateStore(store, newRowList, params$series)
   
   marketOrders <- -currentPos; pos <- allzero
-  # for (i in 1:length(params$series)){
-  i = 2
+  # i means which series
+  i = 1
+  
+  lags <- 4
   all_cl = store$cl[1:store$iter,i]
   df <- data.frame(Close = c(all_cl))
-  lags <- 5
-  lagged_data <- data.frame(
-    Close_1 = lag(df$Close, 1),
-    Close_2 = lag(df$Close, 2),
-    Close_3 = lag(df$Close, 3),
-    Close_4 = lag(df$Close, 4),
-    Close_5 = lag(df$Close, 5),
-    Close = df$Close
-  )
-  
-  # Train a decision tree model on the lagged data
-  model <- rpart(Close ~ ., data = lagged_data)
-  
-  # Create a new data frame with the previous 3 closing prices for today
   if (nrow(df) >= lags){
-  new_data <- data.frame(Close_1 = df$Close[length(df$Close)-4],
-                         Close_2 = df$Close[length(df$Close)-3],
-                         Close_3 = df$Close[length(df$Close)-2],
-                         Close_4 = df$Close[length(df$Close)-1],
-                         Close_5 = df$Close[length(df$Close)])
-  predicted_close <- predict(model, new_data)
-  # print(predicted_close)
+    # Create a new data frame with the previous lags closing prices for today
+    
+    column_names <- paste0("Close_", 1:lags)
+    column_lags <- rev(seq_len(lags))
+    Close_lags <- lapply(column_lags, function(x) lag(df$Close, x))
+    lagged_data <- data.frame(setNames(Close_lags, column_names), Close = df$Close[length(df$Close) - (lags-1):length(df$Close)])
+    # Train a decision tree model on the lagged data
+    model <- rpart(Close ~ ., data = lagged_data)
+    
+    # Create a new data frame with the previous lags closing prices for today
+    new_data <- data.frame(
+      sapply(rev(paste0("Close_", 1:lags)), function(colname) {
+        lagged_col <- lag(df[[colname]], 1)
+        if (!is.null(lagged_col)) {
+          as.xts(lagged_col)
+        }
+      }),
+      Close = df$Close[length(df$Close) - lags + 1]
+    )
+    predicted_close <- predict(model, new_data)
   
-  # print(store$cl[store$iter,1])
-  if(predicted_close>store$cl[store$iter,i]){
-    pos[params$series[i]] <- params$posSizes[params$series[i]]
-  }else{
-    pos[params$series[i]] <- -params$posSizes[params$series[i]]
-  }
+    # print(predicted_close)
+    
+    # print(store$cl[store$iter,1])
+    if(predicted_close>store$cl[store$iter,i]){
+      pos[params$series[i]] <- params$posSizes[params$series[i]]
+    }else{
+      pos[params$series[i]] <- -params$posSizes[params$series[i]]
+    }
   }else {
     # Handle the case where df has fewer than 3 rows
   }
   # }
   marketOrders <- marketOrders + pos
-
+  
   return(list(store=store,marketOrders=marketOrders,
               limitOrders1=allzero,limitPrices1=allzero,
               limitOrders2=allzero,limitPrices2=allzero))
