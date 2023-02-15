@@ -1,6 +1,7 @@
+#turtle strategy
 
 require(TTR)
-maxRows <- 3100
+maxRows <- 3100 # depends on the row number of series
 
 getOrders <- function(store, newRowList, currentPos, info, params) {
   
@@ -8,44 +9,95 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   
   if (is.null(store)) store <- initStore(newRowList,params$series)
   store <- updateStore(store, newRowList, params$series)
+  store <- getIndicatorsAndATR(newRowList,series,store,params)
   
   marketOrders <- -currentPos
   pos <- allzero
   
+  #Portfolio Parameters
   size = 0.01
   maxUnits = 4
   Units=0
-  verbose=TRUE
+  verbose=TRUE #瀛樼枒
   
-  
-  
-  
+  for(i in params$period[3]+2:length(params$series)){
+    ClosePrice <- as.numeric(cl(store[i,])) #瀛樼枒
+    UnitSize <- as.numeric(trunc(size * 100000000)/(store$N[i-1] * ClosePrice))
+    
+    if(pos[params$series[i]] == 0){
+      # Initiate Long position
+      if(as.numeric(store$Hi[i-1]) > as.numeric(store$Max_Entry2[i-2])){
+        # addTxn(Portfolio=portfolio, Symbol=symbol, TxnDate=CurrentDate, TxnPrice=ClosePrice, 
+        #        TxnQty = UnitSize , TxnFees=0, verbose=verbose)
+        N = as.numeric(store$N[i-1])
+        # updateStrat(Portfolio=portfolio, Symbol=symbol, TxnDate = CurrentDate, PosUnitsQty = 1, 
+        #             UnitSize = UnitSize, StopPrice = (ClosePrice-2*N), TxnPrice = ClosePrice, TxnN = N)
+      }else{
+        # Initiate Short position
+        if(as.numeric(store$Lo[i-1]) < as.numeric(store$Min_Entry2[i-2])){
+          # addTxn(Portfolio=portfolio, Symbol=symbol, TxnDate=CurrentDate, TxnPrice=ClosePrice,
+          #        TxnQty = -UnitSize , TxnFees=0, verbose=verbose)
+          N = as.numeric(store$N[i-1])
+          # updateStrat(Portfolio=portfolio, Symbol = symbol, TxnDate = CurrentDate, 
+          #             PosUnitsQty = Units, UnitSize = UnitSize, StopPrice = (ClosePrice +2*N), 
+          #             TxnPrice = ClosePrice, TxnN = N)
+        }
+      }
+    }else{ #  pos != 0
+      # Position exits and stops 閫�鍑哄拰姝㈡崯鏉′欢   瀛樼枒
+      # Stop 瀛樼枒
+      if(( pos[params$series[i]] > 0 && ( as.numeric(store$Lo[i-1]) < as.numeric(store$Min_Entry1[i-2]) || store$Lo[i-1] < Stop )) || 
+        ( pos[params$series[i]] < 0 && ( as.numeric(store$Hi[i-1]) > as.numeric(store$Max_Entry1[i-2]) || store$Hi[i-1] > Stop ))) {
+        # addTxn(Portfolio=portfolio, Symbol=symbol, TxnDate=CurrentDate, 
+        #        TxnPrice=ClosePrice, TxnQty = -Posn , TxnFees=0, verbose=verbose)
+        N = as.numeric(store$N[i-1])
+        # updateStrat(Portfolio = portfolio, Symbol = symbol, TxnDate = CurrentDate, 
+        #             PosUnitsQty = 0, UnitSize = UnitSize, StopPrice = NA, 
+        #             TxnPrice = ClosePrice, TxnN = N)
+      }else{
+        # Add to long position   涔扮殑鍔犱粨鎯呭喌
+        # Units, maxUnits, TxnPrice 瀛樼枒
+        if( pos[params$series[i]] > 0 && Units < maxUnits && Hi(x[i-1,]) > ( TxnPrice + N * 0.5 )) {
+          # addTxn(Portfolio=portfolio, Symbol=symbol, TxnDate=CurrentDate, 
+          #        TxnPrice=ClosePrice, TxnQty = UnitSize , TxnFees=0, verbose=verbose)
+          N = as.numeric(store$N[i-1])
+          # updateStrat(Portfolio = portfolio, Symbol = symbol, TxnDate = CurrentDate, 
+          #             PosUnitsQty = Units+1, UnitSize = UnitSize, StopPrice = (ClosePrice-2*N), 
+          #             TxnPrice = ClosePrice, TxnN = N)
+        } else{
+          # Add to short position  鍗栫殑鍔犱粨鎯呭喌
+          # Units, maxUnits, TxnPrice  瀛樼枒
+          if( Posn < 0 && Units < maxUnits && Lo(x[i-1,])  < ( TxnPrice - N * 0.5 ) ) {
+            # addTxn(Portfolio=portfolio, Symbol=symbol, TxnDate=CurrentDate, TxnPrice=Cl(x[i,]), 
+            #        TxnQty = -UnitSize , TxnFees=0, verbose=verbose)
+            N = as.numeric(store$N[i-1])
+            # updateStrat(Portfolio=portfolio, Symbol=symbol, TxnDate = CurrentDate, 
+            #             PosUnitsQty = Units+1, UnitSize = UnitSize, StopPrice = (ClosePrice+2*N), 
+            #             TxnPrice = ClosePrice, TxnN = N)
+          }
+        }
+      }
+    }
+    
+  } # for寰幆缁堢偣
   
 
 }
-initIndicatorStore <- function(newRowList,series,iter){
-  iter = 0
-  Ind_store <- list(iter=iter+1, Min_Entry1=initClStore(newRowList,series), 
-                    Max_Entry1=initClStore(newRowList,series), Min_Entry2=initClStore(newRowList,series),
-                    Max_Entry2=initClStore(newRowList,series), Min_Exit=initClStore(newRowList,series),
-                    Max_Exit=initClStore(newRowList,series), N=initClStore(newRowList,series))
-  return(Ind_store)
-}
-
-getIndicatorsAndATR <- function(newRowList,series,Ind_store,store,params){
+#瀛樼枒
+getIndicatorsAndATR <- function(newRowList,series,store,params){
   
-  Ind_store$Min_Entry1 <- runMin(store$Lo, params$periods[2])
-  Ind_store$Max_Entry1 <- runMax(store$Hi, params$periods[2])
+  store$Min_Entry1 <- runMin(store$Lo, params$periods[2])
+  store$Max_Entry1 <- runMax(store$Hi, params$periods[2])
   
-  Ind_store$Min_Entry2 <- runMin(store$Lo, params$periods[3])
-  Ind_store$Max_Entry2 <- runMax(store$Hi, params$periods[3])
+  store$Min_Entry2 <- runMin(store$Lo, params$periods[3])
+  store$Max_Entry2 <- runMax(store$Hi, params$periods[3])
   
-  Ind_store$Min_Exit <- runMin(store$Lo, params$periods[1])
-  Ind_store$Max_Exit <- runMax(store$Hi, params$periods[1])
+  store$Min_Exit <- runMin(store$Lo, params$periods[1])
+  store$Max_Exit <- runMax(store$Hi, params$periods[1])
   
-  Ind_store$N <- ATR(store[,c(2,3,4)], n=params$periods[2], maType=EMA, wilder=TRUE)[,'atr']
+  store$N <- ATR(store[,c(2,3,4)], n=params$periods[2], maType=EMA, wilder=TRUE)[,'atr']
   
-  return(Ind_store)
+  return(store)
 }
 
 # to get high and low
@@ -78,12 +130,16 @@ updateClStore <- function(clStore, newRowList, series, iter) {
     clStore[iter,i] <- as.numeric(newRowList[[series[i]]]$Close)
   return(clStore)
 }
+
 initStore <- function(newRowList,series) {
-  return(list(iter=0,cl=initClStore(newRowList,series), Hi=initHiStore(newRowList,series), 
-              Lo=initLoStore(newRowList,series), MinEn1 = initClStore(newRowList,series)))
-  #(list 里面存了iter代表天数和cl--一个matrix用来存close price)
+  return(list(iter=0,Hi=initHiStore(newRowList,series), Lo=initLoStore(newRowList,series), 
+              cl=initClStore(newRowList,series), Min_Entry1=initClStore(newRowList,series), 
+              Max_Entry1=initClStore(newRowList,series), Min_Entry2=initClStore(newRowList,series),
+              Max_Entry2=initClStore(newRowList,series), Min_Exit=initClStore(newRowList,series),
+              Max_Exit=initClStore(newRowList,series), N=initClStore(newRowList,series)))
+  #(list 閲岄潰瀛樹簡iter浠ｈ〃澶╂暟鍜宑l--涓�涓猰atrix鐢ㄦ潵瀛榗lose price)
 }
-#store里面存了close, high, low price
+#store閲岄潰瀛樹簡close, high, low price, entry and exyt line
 updateStore <- function(store, newRowList, series) {
   store$iter <- store$iter + 1
   store$Hi <- getHighprice(store$Hi,newRowList,series,store$iter)
