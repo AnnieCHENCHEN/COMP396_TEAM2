@@ -8,8 +8,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   allzero  <- rep(0,length(newRowList)) # used for initializing vectors
   
   if (is.null(store)) store <- initStore(newRowList,params$series)
-  store <- updateStore(store, newRowList, params$series)
-  store <- getIndicatorsAndATR(newRowList,series,store,params)
+  store <- updateStore(store, newRowList, params$series, params$periods)
   
   marketOrders <- -currentPos
   pos <- allzero
@@ -84,23 +83,23 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
 
 }
 #存疑
-getIndicatorsAndATR <- function(newRowList,series,store,params){
-  
-  store$Min_Entry1 <- runMin(store$Lo, params$periods[2])
-  store$Max_Entry1 <- runMax(store$Hi, params$periods[2])
-  
-  store$Min_Entry2 <- runMin(store$Lo, params$periods[3])
-  store$Max_Entry2 <- runMax(store$Hi, params$periods[3])
-  
-  store$Min_Exit <- runMin(store$Lo, params$periods[1])
-  store$Max_Exit <- runMax(store$Hi, params$periods[1])
-  
-  store$N <- ATR(store[,c(2,3,4)], n=params$periods[2], maType=EMA, wilder=TRUE)[,'atr']
-  
-  return(store)
-}
+# getIndicatorsAndATR <- function(newRowList,series,store,params){
+#   
+#   store$Min_Entry1 <- runMin(store$Lo, params$periods[2])
+#   store$Max_Entry1 <- runMax(store$Hi, params$periods[2])
+#   
+#   store$Min_Entry2 <- runMin(store$Lo, params$periods[3])
+#   store$Max_Entry2 <- runMax(store$Hi, params$periods[3])
+#   
+#   store$Min_Exit <- runMin(store$Lo, params$periods[1])
+#   store$Max_Exit <- runMax(store$Hi, params$periods[1])
+#   
+#   store$N <- ATR(store[,c(2,3,4)], n=params$periods[2], maType=EMA, wilder=TRUE)[,'atr']
+#   
+#   return(store)
+# }
 
-# to get high and low
+# intiate
 initHiStore  <- function(newRowList,series) {
   HiStore <- matrix(0,nrow=maxRows,ncol=length(series))
   return(HiStore)
@@ -109,21 +108,20 @@ initLoStore  <- function(newRowList,series) {
   LoStore <- matrix(0,nrow=maxRows,ncol=length(series))
   return(LoStore)
 }
-#to get high price and low price of the stock
-getHighprice <- function(HiStore, newRowList, series, iter){
+initClStore  <- function(newRowList,series) {
+  clStore <- matrix(0,nrow=maxRows,ncol=length(series))
+  return(clStore)
+}
+#update
+updateHiStore <- function(HiStore, newRowList, series, iter){
   for (i in 1:length(series))
     HiStore[iter,i] <- as.numeric(newRowList[[series[i]]]$High)
   return(HiStore)
 }
-getLowprice <- function(LoStore, newRowList, series, iter){
+updateLoStore <- function(LoStore, newRowList, series, iter){
   for (i in 1:length(series))
     LoStore[iter,i] <- as.numeric(newRowList[[series[i]]]$Low)
   return(LoStore)
-}
-# for close price
-initClStore  <- function(newRowList,series) {
-  clStore <- matrix(0,nrow=maxRows,ncol=length(series))
-  return(clStore)
 }
 updateClStore <- function(clStore, newRowList, series, iter) {
   for (i in 1:length(series))
@@ -137,16 +135,27 @@ initStore <- function(newRowList,series) {
               Max_Entry1=initClStore(newRowList,series), Min_Entry2=initClStore(newRowList,series),
               Max_Entry2=initClStore(newRowList,series), Min_Exit=initClStore(newRowList,series),
               Max_Exit=initClStore(newRowList,series), N=initClStore(newRowList,series)))
-  #(list 里面存了iter代表天数和cl--一个matrix用来存close price)
 }
-#store里面存了close, high, low price, entry and exyt line
-updateStore <- function(store, newRowList, series) {
+#store里面存了close, high, low price, entry and exit line
+updateStore <- function(store, newRowList, series, params) {
   store$iter <- store$iter + 1
-  store$Hi <- getHighprice(store$Hi,newRowList,series,store$iter)
-  store$Lo <- getLowprice(store$Lo,newRowList,series,store$iter)
+  store$Hi <- updateHiStore(store$Hi,newRowList,series,store$iter)
+  store$Lo <- updateLoStore(store$Lo,newRowList,series,store$iter)
   store$cl <- updateClStore(store$cl,newRowList,series,store$iter)
-
+  
+  store$Min_Entry1 <- runMin(store$Lo, params$periods[2])
+  store$Max_Entry1 <- runMax(store$Hi, params$periods[2])
+  
+  store$Min_Entry2 <- runMin(store$Lo, params$periods[3])
+  store$Max_Entry2 <- runMax(store$Hi, params$periods[3])
+  
+  store$Min_Exit <- runMin(store$Lo, params$periods[1])
+  store$Max_Exit <- runMax(store$Hi, params$periods[1])
+  
+  store$N <- ATR(store[,c(2,3,4)], n=params$periods[2], maType=EMA, wilder=TRUE)[,'atr']
   return(store)
 }
+
+
 
 
