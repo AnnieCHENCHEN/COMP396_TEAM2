@@ -14,7 +14,7 @@ getOrders <- function(store, newRowList, currentPos, info, params){
   
   marketOrders <- -currentPos; pos <- allzero
   # for (i in 1:length(params$series)){
-  i = 2
+  i = 1
   all_cl = store$cl[1:store$iter,i]
   df <- data.frame(Close = c(all_cl))
   lags <- 5

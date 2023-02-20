@@ -8,7 +8,7 @@ source('example_strategies.R');
 dataList <- getData(directory="PART1")
 
 # choose strategy from example_strategies
-strategy <- "ML2"
+strategy <- "ML5"
           
 # check that the choice is valid
 is_valid_example_strategy <- function(strategy) { 
@@ -21,7 +21,7 @@ load_strategy(strategy) # function from example_strategies.R
 
 # split data in two (e.g. for in/out test)
 numDays <- nrow(dataList[[2]])
-inSampDays <- 550
+inSampDays <- 10
 print(numDays)
 
 

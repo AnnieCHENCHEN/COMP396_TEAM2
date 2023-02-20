@@ -14,7 +14,9 @@ example_strategies <- c("fixed",
                         "ML2",
                         "test",
                         "1",
-                        "ML3"
+                        "ML3",
+                        "OnlineML4",
+                        "ML5"
                         )
 
 example_params <- list(
@@ -34,7 +36,10 @@ example_params <- list(
                     "ML2" = list(lookback=50,sdParam=1.5,series=c(1,2,3,4,5,6,7,8,9,10),posSizes=rep(1,10)),
                     "test" = list(lookback=50,sdParam=1.5,series=c(1,3,5,7,8,9),posSizes=rep(1,10)),
                     "1" = list(nFast =4, nSlow=4, nSig=9, series=1, posSizes=rep(1,10)),
-                    "ML3" = list(lookback=50,sdParam=1.5,series=c(1,2,3,4,5,6,7,8,9,10),posSizes=rep(1,10))
+                    "ML3" = list(lookback=50,sdParam=1.5,series=c(1,2,3,4,5,6,7,8,9,10),posSizes=rep(1,10)),
+                    "OnlineML4" = list(series=c(1,2,3,4,5,6,7,8,9,10),posSizes=rep(1,10),spreadPercentage=0.001,inventoryLimits=rep(10,10)),
+                    "ML5" = list(lookback=50,sdParam=1.5,series=c(1,2,3,4,5,6,7,8,9,10),posSizes=rep(1,10))
+                    
                     )
 
 load_strategy <- function(strategy) {
