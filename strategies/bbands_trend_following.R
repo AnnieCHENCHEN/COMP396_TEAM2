@@ -12,7 +12,6 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
 
     if (is.null(store)) store <- initStore(newRowList,params$series)
     store <- updateStore(store, newRowList, params$series)
-	
     marketOrders <- -currentPos; pos <- allzero
 
     if (store$iter > params$lookback) {

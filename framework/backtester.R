@@ -270,7 +270,6 @@ backtest <- function(dataList, getOrders, params, sMult) {
 
         # getOrders() is run with YESTERDAY's data to determine what we hold TODAY
         x <- getOrders(store, getRowList(dataList,i-1), oldPosList, info, params)
-
         store            <- x$store
         #browser()
 
