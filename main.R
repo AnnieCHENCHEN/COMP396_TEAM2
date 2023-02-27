@@ -8,7 +8,7 @@ source('example_strategies.R');
 dataList <- getData(directory="PART1")
 
 # choose strategy from example_strategies
-strategy <- "ML5"
+strategy <- "MACD_Method"
           
 # check that the choice is valid
 is_valid_example_strategy <- function(strategy) { 
@@ -21,15 +21,15 @@ load_strategy(strategy) # function from example_strategies.R
 
 # split data in two (e.g. for in/out test)
 numDays <- nrow(dataList[[2]])
-inSampDays <- 10
+inSampDays <- 550
 print(numDays)
 
 
 # in-sample period
-dataList <- lapply(dataList, function(x) x[1:inSampDays])
+ dataList <- lapply(dataList, function(x) x[1:inSampDays])
 
 # out-of-sample period
-#dataList <- lapply(dataList, function(x) x[(inSampDays+1):numDays])
+# dataList <- lapply(dataList, function(x) x[(inSampDays+1):numDays])
 
 sMult <- 0.20 # slippage multiplier
 

@@ -1,4 +1,4 @@
-library(rpart)
+library(vars)
 
 
 maxRows <- 3100 
@@ -14,53 +14,37 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   pos <- allzero
   cp <- allzero
   # series x
-  s=1
   
-  #use decision tree to train model
-  train_data <- data.frame(it=data.frame(it = seq(1, store$iter)), 
-                           Close = store$cl[1:store$iter,s]) 
-  model <- rpart(Close ~ .,data = train_data)
-  new_instance <- data.frame(it =store$iter+1)
-  new_instance2<- data.frame(it =store$iter+2)
-  #use model to predict
-  predicted_close <- predict(model, new_instance)
+  s=1
+  data <- data.frame(Open= store$o[1:store$iter,s],
+                     High = store$h[1:store$iter,s],Low = store$l[1:store$iter,s],
+                     Close = store$cl[1:store$iter,s],Vol = store$v[1:store$iter,s] )
+  
   
   max_close <- max(store$cl[1:store$iter,s])
   min_close <- min(store$cl[1:store$iter,s])
-  print(predicted_close)
-  #if it tends to go up, go long
-  if (predicted_close>train_data$Close[store$iter]) {
-    pos[params$series[s]] <- 1
-  }
-  #if it tends to go down, go short
-  else if (predicted_close<train_data$Close[store$iter]){
-    pos[params$series[s]] <- -1
-  }
-  # else do nothing
-  else{
-    pos[params$series[s]] <- 0
-  }
-  
-  # 
+
   marketOrders <- pos
-  # print(marketOrders)
-  # print(info$balance)
-  # print("********************************")
   
   
-  return(list(store=store,marketOrders=marketOrders,
+  return(list(store=store,marketOrders=allzero,
               limitOrders1=allzero,limitPrices1=allzero,
               limitOrders2=allzero,limitPrices2=allzero))
 }
+
+
+
+
+
 #***********************init Function starts*************************
 initClStore  <- function(newRowList,series) {
   clStore <- matrix(0,nrow=maxRows,ncol=length(series))
   return(clStore)
 }
-# initOpStore  <- function(newRowList,series) {
-#   OpStore <- matrix(0,nrow=maxRows,ncol=length(series))
-#   return(OpStore)
-# }
+initOpStore  <- function(newRowList,series) {
+  OpStore <- matrix(0,nrow=maxRows,ncol=length(series))
+  return(OpStore)
+}
 initHiStore  <- function(newRowList,series) {
   HiStore <- matrix(0,nrow=maxRows,ncol=length(series))
   return(HiStore)
@@ -69,12 +53,14 @@ initLoStore  <- function(newRowList,series) {
   LoStore <- matrix(0,nrow=maxRows,ncol=length(series))
   return(LoStore)
 }
-# initVoStore  <- function(newRowList,series) {
-#   VoStore <- matrix(0,nrow=maxRows,ncol=length(series))
-#   return(VoStore)
-# }
+initVoStore  <- function(newRowList,series) {
+  VoStore <- matrix(0,nrow=maxRows,ncol=length(series))
+  return(VoStore)
+}
 initStore <- function(newRowList,series) {
-  return(list(iter=0,cl=initClStore(newRowList,series),h = initHiStore(newRowList,series),l = initLoStore(newRowList,series)))
+  return(list(iter=0,cl=initClStore(newRowList,series),
+              h = initHiStore(newRowList,series),l = initLoStore(newRowList,series),
+              o = initOpStore(newRowList,series),v = initVoStore(newRowList,series)))
 }
 #***********************init Function ends*************************
 
@@ -83,11 +69,11 @@ initStore <- function(newRowList,series) {
 
 
 #***********************update Function starts*************************
-# updateOpStore <- function(OpStore, newRowList, series, iter) {
-#   for (i in 1:length(series))
-#     OpStore[iter,i] <- as.numeric(newRowList[[series[i]]]$Open)
-#   return(OpStore)
-# }
+updateOpStore <- function(OpStore, newRowList, series, iter) {
+  for (i in 1:length(series))
+    OpStore[iter,i] <- as.numeric(newRowList[[series[i]]]$Open)
+  return(OpStore)
+}
 updateHiStore <- function(HiStore, newRowList, series, iter) {
   for (i in 1:length(series))
     HiStore[iter,i] <- as.numeric(newRowList[[series[i]]]$High)
@@ -98,11 +84,11 @@ updateLoStore <- function(LoStore, newRowList, series, iter) {
     LoStore[iter,i] <- as.numeric(newRowList[[series[i]]]$Low)
   return(LoStore)
 }
-# updateVoStore <- function(VoStore, newRowList, series, iter) {
-#   for (i in 1:length(series))
-#     VoStore[iter,i] <- as.numeric(newRowList[[series[i]]]$Volume)
-#   return(VoStore)
-# }
+updateVoStore <- function(VoStore, newRowList, series, iter) {
+  for (i in 1:length(series))
+    VoStore[iter,i] <- as.numeric(newRowList[[series[i]]]$Volume)
+  return(VoStore)
+}
 updateClStore <- function(clStore, newRowList, series, iter) {
   for (i in 1:length(series))
     clStore[iter,i] <- as.numeric(newRowList[[series[i]]]$Close)
@@ -110,11 +96,11 @@ updateClStore <- function(clStore, newRowList, series, iter) {
 }
 updateStore <- function(store, newRowList, series) {
   store$iter <- store$iter + 1
-  # store$o <- updateOpStore(store$o,newRowList,series,store$iter)
+  store$o <- updateOpStore(store$o,newRowList,series,store$iter)
   store$h <- updateHiStore(store$h,newRowList,series,store$iter)
   store$l <- updateLoStore(store$l,newRowList,series,store$iter)
   store$cl <- updateClStore(store$cl,newRowList,series,store$iter)
-  # store$v <- updateVoStore(store$v,newRowList,series,store$iter)
+  store$v <- updateVoStore(store$v,newRowList,series,store$iter)
   return(store)
 }
 #***********************update Function ends*************************
