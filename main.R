@@ -8,7 +8,7 @@ source('example_strategies.R');
 dataList <- getData(directory="PART1")
 
 # choose strategy from example_strategies
-strategy <- "bbands_contrarian"
+strategy <- "MACD"
           
 # check that the choice is valid
 is_valid_example_strategy <- function(strategy) { 
@@ -29,7 +29,7 @@ print(numDays)
 dataList <- lapply(dataList, function(x) x[1:inSampDays])
 
 # out-of-sample period
-dataList <- lapply(dataList, function(x) x[(inSampDays+1):numDays])
+#dataList <- lapply(dataList, function(x) x[(inSampDays+1):numDays])
 
 sMult <- 0.20 # slippage multiplier
 
