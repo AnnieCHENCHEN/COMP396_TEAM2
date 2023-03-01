@@ -14,6 +14,8 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   pos1 <- allzero
   pos2 <-allzero
   pos3 <- allzero
+  buyTrans <-allzero
+  sellTrans <- list()
   
   atr <- allzero
   agap <- allzero
@@ -26,7 +28,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   if (store$iter > params$lookback) {
     
     for (i in 1:length(params$series)) {
-    
+      
       macd_data <- MACD(store$cl[1:store$iter,i],nFast = 12, nSlow = 26, nSig =9, percent = TRUE)
       DIFF <- macd_data[,1]
       DEA <- macd_data[,2]
@@ -37,45 +39,58 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       #agap[i] <- 1.5*atr[i]
       
       # set stop loss price (stop loss)
-      stop_price[i] <- store$cl[store$iter,i]-3*atr[i]
+      stop_price[i] <- buyTrans[i]-params$multiple2*atr[i]
       
       #calculate stop loss distance
-      distance[i] <- abs(stop_price[i] - store$cl[store$iter,i])
-
+      #distance[i] <- abs(stop_price - store$cl[store$iter,i])
       
-      # set target price (profit target);
-      target_price[i] <- max(store$cl[1:params$lookback,i])+2*atr[i]
+      
+      # set target price (profit target)
+      sellPrices <- unlist(sellTrans) # combine all elements in the list into a vector
+      target_price <- max(sellPrices[1:params$lookback]) + params$multiple1 * atr[i]
       
       #account risk
-      account_risk = 0.002*0.3*info$balance
+      account_risk = params$riskRatio*params$moneyRatio*info$balance
       
-      ## Calculate position size based on account risk, stop loss distance, and profit target distance
-      units[i] <- round(account_risk / (distance[i] * 3*atr[i]))
+      # Calculate position size based on account risk, stop loss distance, and profit target distance
+      units[i] <- round(account_risk / params$multiple2*atr[i])
+      #print(units)
+      #print("************")
+      #print(target_price)
+      
+      if(units[i]>0 && units[i]<=store$v[store$iter,i]){
+        units[i] <- units[i]
+      }else{
+        units[i] <- 1
+      }
       
       
       #Compare MACD line and signal line
       #Calculate buy units and sell units
       #Entry market conditions
       if(store$cl[store$iter,i]>stop_price[i] && store$cl[store$iter,i]< target_price[i]){
-        if (DIFF[store$iter]>0&&DEA[store$iter]>0&&DIFF[store$iter]>DEA[store$iter]&&DIFF[store$iter-1]<DEA[store$iter-1]) {
+        if (DIFF[store$iter]>0&&DEA[store$iter]>0&&DIFF[store$iter]>DEA[store$iter]
+            &&DIFF[store$iter-1]<DEA[store$iter-1]) {
+          
           #buy,+1
           pos1[params$series[i]] <- params$posSizes[params$series[i]]*units[i]
-          # print("buy")
-          # print(store$iter)
+          buyTrans[i] <- store$cl[store$iter,i]
+          
+          
         }
-        else if (DIFF[store$iter]<0&&DEA[store$iter]<0&&DIFF[store$iter]<DEA[store$iter]&&DIFF[store$iter-1]>DEA[store$iter-1]
-                 && currentPos[i] !=0) {
+        else if (DIFF[store$iter]<0&&DEA[store$iter]<0&&DIFF[store$iter]<DEA[store$iter]
+                 &&DIFF[store$iter-1]>DEA[store$iter-1]&& currentPos[i] !=0) {
+          
           #sell, -1
           pos2[params$series[i]] <- -params$posSizes[params$series[i]]*units[i]
-      
+          sellTrans[[params$series[i]]] <- c(sellTrans[[params$series[i]]], store$cl[store$iter,i])
+          
         } 
       }
-      else if (store$cl[store$iter-1,i]>stop_price[i] && store$cl[store$iter,i]<=stop_price[i] || store$cl[store$iter,i]>= target_price[i] 
-               && currentPos[i]>=0){ #if store$cl[store$iter,i]<=stop_price[i], we trade units that we have as market order. Exit market
-         pos3[params$series[i]] <- -currentPos[i]
-        # print(-params$posSizes[params$series[i]])
-        # print(currentPos[i])
-         
+      else if (store$cl[store$iter-1,i]>stop_price[i] && store$cl[store$iter,i]<=stop_price[i]
+               || store$cl[store$iter,i]>= target_price[i] && currentPos[i]>=0){ #if store$cl[store$iter,i]<=stop_price[i], we trade units that we have as market order. Exit market
+        pos3[params$series[i]] <- -currentPos[i]
+        
       }
       
     }
