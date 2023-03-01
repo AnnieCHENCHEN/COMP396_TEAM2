@@ -28,7 +28,7 @@ example_params <- list(
                     "extreme_limit"=list(spreadPercentage=0.001,inventoryLimits=rep(10,10)),
                     "meanReversion"=list(lookback=20,sdParam=1.5,series=1,posSizes=rep(1,10), profit_target=50000),
                     "momentum2" =list(lookbacks=list(short=as.integer(5),medium=as.integer(10),long=as.integer(20)),sdParam=1.5,series=1:10,posSizes=rep(1,10)),
-                    "MACD" = list(lookback=50,series=c(1,2,3,4,5,6,7,8,9,10),posSizes=rep(1,10),spreadPercentage=0.001)
+                    "MACD" = list(lookback=100,series=1:10,posSizes=rep(1,10),spreadPercentage=0.001)
                     )
 
 load_strategy <- function(strategy) {
