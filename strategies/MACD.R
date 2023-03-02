@@ -42,7 +42,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         
         #buy,+1
         pos[params$series[i]] <- params$posSizes[params$series[i]]
-        buyTrans[params$series[i]]<- store$cl[store$iter,i]
+        buyTrans[params$series[i]]<- store$cl[store$iter,i] ##problem1
         
         
       }
@@ -51,7 +51,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         
         #sell, -1
         pos[params$series[i]] <- -params$posSizes[params$series[i]]
-        sellTrans[params$series[i]] <- store$cl[store$iter,i]
+        sellTrans[params$series[i]] <- store$cl[store$iter,i] ##problem2
         
       }
       
@@ -63,10 +63,10 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       #risk management part
       if(buyTrans[params$series[i]] >0 && sellTrans[params$series[i]]>0){
         # set stop loss price (stop loss)
-        stop_price[params$series[i]] <- tail(buyTrans[params$series[i]],n=1)-params$multiple2*atr[i]
+        stop_price[params$series[i]] <- tail(buyTrans[params$series[i]],n=1)-params$multiple2*atr[i] ##problem3
         
         # set target price (profit target)
-        target_price[params$series[i]] <- max(sellTrans[params$series[i]]) + params$multiple1 * atr[i]
+        target_price[params$series[i]] <- max(sellTrans[params$series[i]]) + params$multiple1 * atr[i] ##problem4
       }
       
       #account risk, got 30% of 10000000 in this strategy
