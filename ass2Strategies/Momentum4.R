@@ -11,27 +11,25 @@ maxRows <- 3100 # used to initialize a matrix to store closing prices
 getOrders <- function(store, newRowList, currentPos, info, params) {
   allzero  <- rep(0,length(newRowList)) # used for initializing vectors
   pos <- allzero
- 
-  if (is.null(store))
-    store <- initStore(newRowList)  
-  else
-    store <- updateStore(store, newRowList)  
+  marketOrders <- -currentPos
+   
+  if (is.null(store)) store <- initStore(newRowList,params$series)
+  store <- updateStore(store, newRowList, params$series)
  
 
   if (store$iter > params$lookbacks$long) {  
     for(i in params$series){
       if(i != 0){
-        TMA_List <- getTMA(store$cl[[i]], params$lookbacks)  #return a list
-        CurrentClose <- last(store$cl[[i]])
+     
+        TMA_List <- getTMA(store, params)  #return a list
+        CurrentClose <- last(store$cl[i])
         pos[params$series[i]] <- getPosSignFromTMA(TMA_List) * getPosSize(current_close)
        
       }
      
     }
   }
- 
   marketOrders <- -currentPos + pos
-
  
   return(list(store=store,marketOrders=marketOrders,
               limitOrders1=allzero,limitPrices1=allzero,
@@ -105,36 +103,30 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
 
 ###############################################################################
 
-# getTMA <- function(prices, lookbacks, with_checks=FALSE) {
-#  
-#   # prices and lookbacks should pass (return FALSE) when used with
-#   # the 6 checks, as tested in the following call to allChecks that
-#   # you should not edit
-#   if (with_checks)
-#     if (atLeastOneError(close_prices, lookbacks))
-#       stop('At least one of the errors E01...E06 occured')
-#  
-#   ret = list(short = 0, medium = 0, long = 0)
-#   for (i in 1 : length(lookbacks)){
-#    
-#     #calculate SMA for each lookbacks
-#     sma <- SMA(prices$Close, n = lookbacks[[i]])
-#     ret [i] = as.numeric(sma[length(sma)])
-#   }
-#   return(ret)
-# }
-
 getTMA <- function(store, params) {
-  ret <- 0
-  sma <- 0
-  ret <- list(short = 0, medium = 0, long =0)
- 
-  for (i in 1:length(params$lookbacks)) {
-    sma[i] <- as.numeric(last(SMA(store$Close, n = lookbacks[[i]])))
-    ret[[i]] <- sma[i]
+
+  ret = list(short = 0, medium = 0, long = 0)
+  for (i in 1 : length(params$lookbacks)){
+    price_store <- store$cl[1:store$iter,i]
+    #calculate SMA for each lookbacks
+    sma[i] <- SMA(price_store, n = params$lookbacks[i])
+    ret [i] = as.numeric(sma[i])
   }
   return(ret)
 }
+
+# getTMA <- function(store, params) {
+#   sma <- 0
+#   ret <- list(short = 0, medium = 0, long =0)
+#   #store price
+#   price_store <- store$cl[1:store$iter,i]
+#  
+#   for (i in 1:length(params$lookbacks)) {
+#     sma[i] <- as.numeric(last(SMA(price_store, n = lookbacks[[i]])))
+#     ret[[i]] <- sma[i]
+#   }
+#   return(ret)
+# }
 
 getPosSignFromTMA <- function(tma_list) {
  
