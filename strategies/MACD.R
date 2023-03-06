@@ -6,9 +6,17 @@ maxRows <- 3100
 getOrders <- function(store, newRowList, currentPos, info, params) {
   
   allzero  <- rep(0,length(newRowList)) 
+  spread <- sapply(1:length(newRowList),function(i)
+    params$spreadPercentage * (newRowList[[i]]$High -
+                                 newRowList[[i]]$Low))
+  limitPrices1  <- sapply(1:length(newRowList),function(i) 
+    newRowList[[i]]$Close - spread[i]/2)
+  limitPrices2  <- sapply(1:length(newRowList),function(i) 
+    newRowList[[i]]$Close + spread[i]/2)
   
   if (is.null(store)) store <- initStore(newRowList,params$series)
   store <- updateStore(store, newRowList, params$series)
+  Trade <- updateTrade(Trade,store,params$series,store$iter)
   
   #initial all lists
   pos <- allzero
@@ -23,7 +31,6 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   units <- allzero
   stop_price <- allzero
   target_price <- allzero
-  distance <- allzero
   
   
   if (store$iter > params$lookback) {
@@ -33,7 +40,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       macd_data <- MACD(store$cl[1:store$iter,i],nFast = 12, nSlow = 26, nSig =9, percent = TRUE)
       DIFF <- macd_data[,1]
       DEA <- macd_data[,2]
-      
+      print(Trade)
       
       #Compare MACD line and signal line, get the position signal
       #Entry market conditions
@@ -42,7 +49,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         
         #buy,+1
         pos[params$series[i]] <- params$posSizes[params$series[i]]
-        buyTrans[params$series[i]]<- store$cl[store$iter,i] ##problem1
+        buyTrans[params$series[i]]<- Trade$BuyPrice[Trade$count,i] ##problem1
         
         
       }
@@ -51,9 +58,10 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         
         #sell, -1
         pos[params$series[i]] <- -params$posSizes[params$series[i]]
-        sellTrans[params$series[i]] <- store$cl[store$iter,i] ##problem2
+        sellTrans[params$series[i]] <- Trade$SellPrice[Trade$count,i] ##problem2
         
       }
+      
       
       
       #Calculate ATR indicator. Use it in the stop loss
@@ -61,13 +69,13 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       atr[i] <- tail(ATR(object,n=10,maType = "EMA")[,2], n=1)
       
       #risk management part
-      if(buyTrans[params$series[i]] >0 && sellTrans[params$series[i]]>0){
+    # if(last(buyTrans[params$series[i]]) !=0){
         # set stop loss price (stop loss)
-        stop_price[params$series[i]] <- tail(buyTrans[params$series[i]],n=1)-params$multiple2*atr[i] ##problem3
+      #  stop_price[params$series[i]] <- tail(buyTrans[params$series[i]],n=1)-params$multiple2*atr[i] ##problem3
         
         # set target price (profit target)
-        target_price[params$series[i]] <- max(sellTrans[params$series[i]]) + params$multiple1 * atr[i] ##problem4
-      }
+      #  target_price[params$series[i]] <- apply(sellTrans[params$series[i]], 2, max) + params$multiple1 * atr[i] ##problem4
+     # }
       
       #account risk, got 30% of 10000000 in this strategy
       account_risk = params$riskRatio*params$moneyRatio*info$balance
@@ -97,17 +105,9 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   
   #set limit price & limit orders
   
-  spread <- sapply(1:length(newRowList),function(i)
-    params$spreadPercentage * (newRowList[[i]]$High -
-                                 newRowList[[i]]$Low))
-  
   limitOrders1  <- pos1 # BUY LIMIT ORDERS
-  limitPrices1  <- sapply(1:length(newRowList),function(i) 
-    newRowList[[i]]$Close - spread[i]/2)
   
   limitOrders2  <- pos2# SELL LIMIT ORDERS
-  limitPrices2  <- sapply(1:length(newRowList),function(i) 
-    newRowList[[i]]$Close + spread[i]/2)
   
   return(list(store=store,marketOrders=pos3,
               limitOrders1=limitOrders1,limitPrices1=limitPrices1,
@@ -138,11 +138,22 @@ initVoStore  <- function(newRowList,series) {
   VoStore <- matrix(0,nrow=maxRows,ncol=length(series))
   return(VoStore)
 }
-
+initBuyPrice <- function(newRowList,series) {
+  BuyPrice <- matrix(0,nrow=maxRows,ncol=length(series))
+  return(BuyPrice)
+}
+initSellPrice <- function(newRowList,series) {
+  SellPrice <- matrix(0,nrow=maxRows,ncol=length(series))
+  return(SellPrice)
+}
 initStore <- function(newRowList,series) {
   return(list(iter=0,cl=initClStore(newRowList,series),
               h = initHiStore(newRowList,series),l = initLoStore(newRowList,series),
               o = initOpStore(newRowList,series),v = initVoStore(newRowList,series)))
+}
+initTrade <- function(newRowList,series){
+  return(list(count=0, BuyPrice=initBuyPrice(newRowList,series),
+              SellPrice=initSellPrice(newRowList,series)))
 }
 #***********************init Function ends*************************
 
@@ -184,6 +195,22 @@ updateStore <- function(store, newRowList, series) {
   store$cl <- updateClStore(store$cl,newRowList,series,store$iter)
   store$v <- updateVoStore(store$v,newRowList,series,store$iter)
   return(store)
+}
+updateBuyPrice <- function(BuyPrice, LimitPrice1,newRowList, series, iter){
+  for (i in 1:length(series))
+    BuyPrice[iter,i] <- as.numeric(min(LimitPrice1[,i],newRowList[[series[i]]]$High))
+  return(BuyPrice)
+}
+updateSellPrice <- function(SellPrice, LimitPrice2,newRowList, series, iter){
+  for (i in 1:length(series))
+    SellPrice[iter,i] <- as.numeric(max(LimitPrice2[,i],newRowList[[series[i]]]$Low))
+   return(SellPrice)
+}
+updateTrade <- function(Trade,store,series,iter){
+  Trade$count <-store$iter
+  Trade$BuyPrice <-updateBuyPrice(Trade$BuyPrice,LimitPrice1,newRowList,series,Trade$count)
+  Trade$SellPrice <-updateSellPrice(Trade$SellPrice,LimitPrice2,newRowList,series,Trade$count)
+  return(Trade)
 }
 #***********************update Function ends*************************
 
