@@ -17,7 +17,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   else
     store <- updateStore(store, newRowList)  
   
-    
+
   if (store$iter > params$lookbacks$long) {  
     
     for(i in 1:length(params$series)){
@@ -26,20 +26,13 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       #get a list:each column stores returns for each series and calculate the mean value for each series
       CloseDiffs <- diff(store$cl)
       absCloseDiffs    <- matrix(abs(CloseDiffs),ncol = length(params$series),byrow=TRUE)
-      #if (absCloseDiffs != 0) {
-       
-        # Calculate the column means for non-zero elements
-        #avgAbsDiffs <- colMeans(absCloseDiffs[absCloseDiffs>0], na.rm = TRUE)
-      #}
-      avgAbsDiffs <- apply(absCloseDiffs[,absCloseDiffs>0],2,mean)
-      #apply(mat[, mat != 0], 2, mean)
-      #avgAbsDiffs <- sapply(absCloseDiffs,mean,na.rm=TRUE)
-      
-      print(avgAbsDiffs)
+
+      # Calculate the column means for non-zero elements and find the largest mean value
+        avgAbsDiffs <- colMeans(absCloseDiffs, na.rm = TRUE)
       largestAvgAbsDiffs <- max(avgAbsDiffs)
+      
       posSizes <- round(largestAvgAbsDiffs/avgAbsDiffs)
       
-      #print( CloseDiffs )
       ###get TMA ratio
       tma_list = list(short = 0, medium = 0, long = 0)
       for (m in 1 : length(params$lookbacks)){
