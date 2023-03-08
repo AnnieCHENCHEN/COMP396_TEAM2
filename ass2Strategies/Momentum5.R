@@ -11,7 +11,8 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   buyPos <- allzero
   sellPos <- allzero
   posSizes <- allzero
-
+  marketPos <- allzero
+  
 
   if (is.null(store))
     store <- initStore(newRowList)  
@@ -29,9 +30,9 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       absCloseDiffs    <- matrix(abs(CloseDiffs),ncol = length(params$series),byrow=TRUE)
 
       # Calculate the column means for non-zero elements and find the largest mean value
-        avgAbsDiffs <- colMeans(absCloseDiffs, na.rm = TRUE)
+        avgAbsDiffs <- apply(absCloseDiffs, 2, function(x) mean(x[x > 0]))
       largestAvgAbsDiffs <- max(avgAbsDiffs)
-      
+    
       posSizes <- round(largestAvgAbsDiffs/avgAbsDiffs)
       
       ###get TMA ratio
@@ -41,51 +42,56 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         sma <- SMA(store$cl[1:store$iter,i], n = params$lookbacks[[m]])
         tma_list [m] = as.numeric(sma[length(sma)])}
    
-      ##set stop loss: params$stopRatio
-      #stopRatio <- 0.1
-      stopRate <- params$stopRatio
+    
       
       ###get trade signaland position according to TMA ratio
       if (tma_list[[1]] != 'NA' && tma_list[[2]] != 'NA' && tma_list[[3]] != 'NA'){
         if (tma_list$short < tma_list$medium && tma_list$medium < tma_list$long){
           buyPos[params$series[i]] <- 1 * posSizes[i]
           
-          #for long position
-          #if (pos[params$series[i]] > 0){
-            #calculate the stop loss price level for long position
-            highestPrice <- 0
-            highestPrice <- tail(cummax(store$cl[(store$iter-params$lookbacks$medium):store$iter,i]),1)
-            maxStopLoss_price <- (1-stopRate) * highestPrice
-            
-            #set condition: if price reaches stop loss level, then exit the market
-            if (store$cl[store$iter,i] <= maxStopLoss_price){ 
-              #pos[params$series] <- allzero #exit market
-              marketPos <- -currentPos
-            } 
-            #}
+         
         }
         else if (tma_list$short > tma_list$medium && tma_list$medium > tma_list$long){
           sellPos[params$series[i]] <- -1 * posSizes[i]
-          # for short position 
-          #else if (pos[params$series[i]] < 0){ 
-            #calculate the stop loss price level for short position
-            lowestPrice <- 0
-            lowestPrice <- tail(cummin(store$cl[(store$iter-params$lookbacks$medium):store$iter,i]),1)
-            minStopLoss_price <- (1+stopRate) * lowestPrice
-            
-            #set condition: if price reaches stop loss level, then exit the market
-            if (store$cl[[i]] >= minStopLoss_price){ 
-              #pos[params$series] <- 0 #exit market
-              marketPos <- -currentPos
-
-            }
-          #}
+          
+         
         }
       }
       
-    
-     
-    }}
+      
+      ##set stop loss: params$stopRatio
+      #stopRatio <- 0.1
+      stopRate <- params$stopRatio
+      
+      #calculate the stop loss price level for long position
+      highestPrice <- 0
+      highestPrice <- tail(cummax(store$cl[(store$iter-params$lookbacks$medium):store$iter,i]),1)
+      maxStopLoss_price <- (1-stopRate) * highestPrice
+      
+      lowestPrice <- 0
+      lowestPrice <- tail(cummin(store$cl[(store$iter-params$lookbacks$medium):store$iter,i]),1)
+      minStopLoss_price <- (1+stopRate) * lowestPrice
+      
+      #for long position
+      if (buyPos[params$series[i]] != 0 && store$cl[store$iter,i] <= maxStopLoss_price && currentPos !=0){
+      
+      #set condition: if price reaches stop loss level, then exit the market
+        marketPos <- -currentPos
+      
+      }
+      
+      
+      # for short position 
+      if (sellPos[params$series[i]] != 0 && store$cl[store$iter,i] >= minStopLoss_price && currentPos !=0){
+        
+        #set condition: if price reaches stop loss level, then exit the market
+        marketPos <- -currentPos
+        #print(sellPos[params$series[i]])
+        #print("############")
+        #print(marketPos)
+      }
+      
+      }}
 
   #set limit price & limit orders
   spread <- sapply(1:length(newRowList),function(i)
@@ -99,6 +105,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   limitPrices2  <- sapply(1:length(newRowList),function(i) 
     newRowList[[i]]$Close + spread[i]/2)
   
+  print(marketPos)
  
   return(list(store=store,marketOrders=marketPos,
               limitOrders1=limitOrders1,limitPrices1=limitPrices1,
