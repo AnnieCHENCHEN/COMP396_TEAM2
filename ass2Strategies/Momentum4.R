@@ -7,7 +7,7 @@ maxRows <-3100
 
 getOrders <- function(store, newRowList, currentPos, info, params) {
   # used for initializing vectors
-  allzero  <- rep(0,length(newRowList))
+  allzero  <- rep(0,length(newRowList)) 
   pos <- allzero
   posSizes <- allzero
   signal <- allzero
@@ -16,34 +16,30 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
     store <- initStore(newRowList)  
   else
     store <- updateStore(store, newRowList)  
- 
-  # # get positioin sizing. We calculate the position size with the
-  # # @param CloseDiffs :the
-  # # @param CloseDiffs :the
-  # CloseDiffs <- lapply(dataList,function(x) diff(x$Close))
-  # absCloseDiffs    <- lapply(CloseDiffs,abs)
-  # avgAbsDiffs <- sapply(absCloseDiffs,mean,na.rm=TRUE)
-  #
-  # largestAvgAbsDiffs <- max(avgAbsDiffs)
-  # posSizes <- round(largestAvgAbsDiffs/avgAbsDiffs)
-   
+  
+    
   if (store$iter > params$lookbacks$long) {  
-   
+    
     for(i in 1:length(params$series)){
-     
+      
       # get positioin sizing. We calculate the position size with the close price
-     
-      CloseDiffs <- lapply(store,function(x) diff(store$cl))
-      #CloseDiffs <- lapply(dataList,function(x) diff(x$Close))
-      absCloseDiffs    <- lapply(CloseDiffs,abs)
-      #avgAbsDiffs <- mean(absCloseDiffs,na.rm=TRUE)
-     
-      avgAbsDiffs <- sapply(absCloseDiffs,mean,na.rm=TRUE)
-     
+      #get a list:each column stores returns for each series and calculate the mean value for each series
+      CloseDiffs <- diff(store$cl)
+      absCloseDiffs    <- matrix(abs(CloseDiffs),ncol = length(params$series),byrow=TRUE)
+      #if (absCloseDiffs != 0) {
+       
+        # Calculate the column means for non-zero elements
+        #avgAbsDiffs <- colMeans(absCloseDiffs[absCloseDiffs>0], na.rm = TRUE)
+      #}
+      avgAbsDiffs <- apply(absCloseDiffs[,absCloseDiffs>0],2,mean)
+      #apply(mat[, mat != 0], 2, mean)
+      #avgAbsDiffs <- sapply(absCloseDiffs,mean,na.rm=TRUE)
+      
+      print(avgAbsDiffs)
       largestAvgAbsDiffs <- max(avgAbsDiffs)
       posSizes <- round(largestAvgAbsDiffs/avgAbsDiffs)
-     
-      print( CloseDiffs )
+      
+      #print( CloseDiffs )
       ###get TMA ratio
       tma_list = list(short = 0, medium = 0, long = 0)
       for (m in 1 : length(params$lookbacks)){
@@ -62,21 +58,21 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
           signal[params$series[i]] <- 0
         }
       }
-     
-      ##record trade position as signal*position sizes
+      
+      ##record trade position as signal*position sizes 
       if(i != 0){
         #CurrentClose <- last(store$cl[[i]])
         pos[params$series[i]] <- signal[params$series[i]] * posSizes[i]
       }
-     
+      
       # marketOrders <- -currentPos + pos
       # print(marketOrders)
       # print("adgjkjsbgljbGOLVHS")
-     
+      
       ##set stop loss params$stopRatio
       #stopRatio <- 0.1
       stopRate <- params$stopRatio
-   
+    
       #for long position
       if (pos[params$series[i]] > 0){
         #calculate the stop loss price level for long position
@@ -85,20 +81,20 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         maxStopLoss_price <- (1-stopRate) * highestPrice
        
         #set condition: if price reaches stop loss level, then exit the market
-        if (store$cl[store$iter,i] <= maxStopLoss_price){
+        if (store$cl[store$iter,i] <= maxStopLoss_price){ 
           pos[params$series] <- 0 #exit market
           marketOrders <- currentPos
         }}
-   
-      # for short position
-      else if (pos[params$series[i]] < 0){
+    
+      # for short position 
+      else if (pos[params$series[i]] < 0){ 
         #calculate the stop loss price level for short position
         lowestPrice <- 0
         lowestPrice <- tail(cummin(store$cl[(store$iter-params$lookbacks$medium):store$iter,i]),1)
         minStopLoss_price <- (1+stopRate) * lowestPrice
        
         #set condition: if price reaches stop loss level, then exit the market
-        if (store$cl[[i]] >= minStopLoss_price){
+        if (store$cl[[i]] >= minStopLoss_price){ 
           pos[params$series] <- 0 #exit market
           marketOrders <- currentPos
         #   print(marketOrders)
@@ -107,8 +103,8 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
          }
       }
     }}
- 
- 
+  
+  
 
   marketOrders <- -currentPos + pos
  
@@ -149,3 +145,4 @@ updateStore <- function(store, newRowList,series) {
   store$hi <- updateClStore(store$hi,newRowList,params$series,store$iter)
   return(store)  
 }
+
