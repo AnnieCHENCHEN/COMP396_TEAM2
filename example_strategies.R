@@ -10,7 +10,7 @@ example_strategies <- c("fixed",
                         "simple_limit",
                         "extreme_limit",
                         "meanReversion",
-                        "momentum2",
+                        "Momentum4",
                         "MACD"
 )
 
@@ -27,9 +27,9 @@ example_params <- list(
   "simple_limit"=list(spreadPercentage=0.001,inventoryLimits=rep(10,10)),
   "extreme_limit"=list(spreadPercentage=0.001,inventoryLimits=rep(10,10)),
   "meanReversion"=list(lookback=20,sdParam=1.5,series=1,posSizes=rep(1,10), profit_target=50000),
-  "momentum2" =list(lookbacks=list(short=as.integer(5),medium=as.integer(10),long=as.integer(20)),sdParam=1.5,series=1:10,posSizes=rep(1,10)),
-  "MACD" = list(lookback=100,series=1,posSizes=rep(1,10),spreadPercentage=0.001,
-                multiple1=3,multiple2=2,moneyRatio=0.3,riskRatio=0.02)
+  "Momentum4" =list(lookbacks=list(short=as.integer(5),medium=as.integer(10),long=as.integer(20)),sdParam=1.5,series=1:10,posSizes=rep(1,10)),
+  "MACD" = list(lookback=50,series=1,spreadPercentage=0.001,
+                multiple=1,moneyRatio=0.3,riskRatio=0.02,initUnit=5)
 )
 
 load_strategy <- function(strategy) {
