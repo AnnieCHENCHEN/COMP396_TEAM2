@@ -20,7 +20,6 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   Sstop_price <- allzero
   
   atr <- allzero
-  agap <- allzero
   units <- allzero
   
   
@@ -28,6 +27,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
     
     for (i in 1:length(params$series)) {
       
+      #Calcaute DIFF and DEA in MACD indicator
       macd_data <- MACD(store$cl[1:store$iter,i],nFast = 12, nSlow = 26, nSig =9, percent = TRUE)
       DIFF <- macd_data[,1]
       DEA <- macd_data[,2]
@@ -48,6 +48,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       # Calculate position size based on account risk
       units[params$series[i]] <- round(account_risk / params$multiple*atr[i])
       
+      #If units <=0 or larger than volume, set position size as inital unit
       if(units[params$series[i]]<=0 || units[params$series[i]]>store$v[store$iter,i]){
         units[params$series[i]]<- params$initUnit
       }else{
