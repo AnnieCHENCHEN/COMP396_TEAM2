@@ -2,6 +2,8 @@ library(TTR)
 
 maxRows <- 3100 
 
+#parameters
+#lookback=110,series=1:10,spreadPercentage=0.001,multiple=3,moneyRatio=0.3,riskRatio=0.01,initUnit=10
 
 getOrders <- function(store, newRowList, currentPos, info, params) {
   
@@ -36,8 +38,8 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       
       #risk management part 
       # set stop loss price for long and short
-      Bstop_price[params$series[i]] <- store$cl[store$iter-1,i]-params$multiple*atr[i]
-      Sstop_price[params$series[i]] <- store$cl[store$iter-1,i]+params$multiple*atr[i]
+      Bstop_price[params$series[i]] <- store$cl[store$iter,i]-params$multiple*atr[i]
+      Sstop_price[params$series[i]] <- store$cl[store$iter,i]+params$multiple*atr[i]
       
       
       #account risk, got 30% of 10000000 in this strategy
@@ -47,32 +49,35 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       units[params$series[i]] <- round(account_risk / params$multiple*atr[i])
       
       if(units[params$series[i]]<=0 || units[params$series[i]]>store$v[store$iter,i]){
-        units[params$series[i]]<- 50
+        units[params$series[i]]<- params$initUnit
       }else{
-        units[params$series[i]]<-units[params$series[i]]
+        units[params$series[i]]<- units[params$series[i]]
       }
       
       #Compare MACD line and signal line, get the position signal
       #Entry market conditions
+      # DIFF & DEA >0 & DIFF>DEA & DIFF (yesterday) is smaller than DEA (yesterday)
       if (DIFF[store$iter]>0 && DEA[store$iter]>0 && DIFF[store$iter]>DEA[store$iter]
           && DIFF[store$iter-1]<DEA[store$iter-1]) {
         
-        #buy,+1
+        #buy,signal= +1, position sizes= 1*units
         pos1[params$series[i]] <- 1*units[params$series[i]]
         
         
       }
       else if (DIFF[store$iter]<0 && DEA[store$iter]<0 && DIFF[store$iter]<DEA[store$iter]
                && DIFF[store$iter-1]>DEA[store$iter-1] && currentPos[i] !=0) {
+        #DIFF & DEA <0 & DIFF<DEA & DIFF (yesterday) is bigger than DEA (yesterday) & currentPos has units
         
-        #sell, -1
+        #sell, signal= -1, position sizes= -1*units
         pos2[params$series[i]] <- -1*units[params$series[i]]
         
       }
       
       
       else if (store$cl[store$iter-1,i]>Bstop_price[i] && store$cl[store$iter,i]<=Bstop_price[i]
-               ||store$cl[store$iter,i]>=Sstop_price[params$series[i]] && currentPos[i]>=0){ #if store$cl[store$iter,i]<=stop_price[i], we trade units that we have as market order. Exit market
+               ||store$cl[store$iter-1,i]<Sstop_price[params$series[i]] && store$cl[store$iter,i]>=Sstop_price[params$series[i]] 
+               && currentPos[i]>=0){ #Exit market. When close price <= buy stop price or close price >= sell stop price, we trade our currentPos using market order
         pos3[params$series[i]] <- -currentPos[params$series[i]]
         
       }
@@ -168,5 +173,6 @@ updateStore <- function(store, newRowList, series) {
   return(store)
 }
 #***********************update Function ends*************************
+
 
 
