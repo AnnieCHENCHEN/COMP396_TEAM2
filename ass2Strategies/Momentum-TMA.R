@@ -1,9 +1,10 @@
 # Momentum strategy (with TMA with stop loss)
 # This strategy uses only marker order
 
-maxRows <-3100
+#"Momentum2" =list(lookbacks=list(short=as.integer(15),medium=as.integer(40),long=as.integer(90)),moneyRate=0.3
+#                  ,series=1:10,stopRatio=0.3,riskPortion=0.001,riskPerShare=4,spreadPercentage=0.001)
 
-#dataList <- getData(directory="PART1")
+maxRows <-3100
 
 getOrders <- function(store, newRowList, currentPos, info, params) {
   # used for initializing vectors
@@ -13,7 +14,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   posSizes <- allzero
   marketPos <- allzero
   
-
+  
   if (is.null(store))
     store <- initStore(newRowList)  
   else
@@ -31,15 +32,15 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
 
       # Calculate the column means for non-zero elements and find the largest mean value
         avgAbsDiffs <- apply(absCloseDiffs, 2, function(x) mean(x[x > 0]))
-     # largestAvgAbsDiffs <- max(avgAbsDiffs)
-    
+
         #calculate position size
         #params$riskPortion:The maximum amount of money you are willing to lose on a single trade.
         #params$riskPerShare:The risk per share as a multiple of the average absolute difference. 
-      #posSizes <- round(largestAvgAbsDiffs/avgAbsDiffs)
-      posSizes <- round((params$riskPortion*info$balance)/(params$riskPerShare*avgAbsDiffs))
-      print(posSizes)
-      
+        #split total investment for TMA strategy
+        balance=info$balance*params$moneyRate
+        
+      posSizes <- round((params$riskPortion*balance)/(params$riskPerShare*avgAbsDiffs))
+    
       ###get TMA ratio
       tma_list = list(short = 0, medium = 0, long = 0)
       for (m in 1 : length(params$lookbacks)){
@@ -59,10 +60,10 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       
       
       ##set stop loss: params$stopRatio
-      #stopRatio <- 0.1
       stopRate <- params$stopRatio
       
       #calculate the stop loss price level for long position
+      #find the max and min close price in past days(medium lookback)
       highestPrice <- tail(cummax(store$cl[(store$iter-params$lookbacks$medium):store$iter,i]),1)
       maxStopLoss_price <- (1-stopRate) * highestPrice
       
