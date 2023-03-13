@@ -1,7 +1,7 @@
 #turtle strategy
-#Parameters : "turtle_trade"=list(periods=c(10,20,55), series=1:10, size=0.01, moneyRatio=0.02, Units=0,
-#capitals=300000, spreadPercentage=0.001, multi=4, Multi_N=5)
-#periods, moneyRatio, multi, Multi_N, series 需要优化
+#Parameters : "turtle_trade"=list(periods=c(10,20,55), series=3, size=0.01, moneyRatio=0.02, Units=0,
+#capi_Ratio=0.3, spreadPercentage=0.001, multi=4, Multi_N=5)
+#periods, moneyRatio, multi, Multi_N, series, capi_Ratio 需要优化
 #
 #
 #
@@ -31,7 +31,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       
       store_data <- data.frame(high=store$Hi[,i], low=store$Lo[,i], close=store$cl[,i])
       N_value <- ATR(store_data, n=params$periods[2], maType=EMA, wilder=TRUE)[,'atr']
-      UnitSize <- as.numeric(trunc((params$size * params$capitals * params$moneyRatio)/(N_value[store$iter] * params$multi)))
+      UnitSize <- as.numeric(trunc((params$size * 1000000 * params$capi_Ratio* params$moneyRatio)/(N_value[store$iter] * params$multi)))
 
       # Initiate Long position
       if(as.numeric(store$Hi[store$iter,i]) > as.numeric(storeOfEnEx$Max_En2[store$iter-1,i])){
