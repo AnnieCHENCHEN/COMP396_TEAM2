@@ -1,5 +1,10 @@
 #turtle strategy
-
+#Parameters : "turtle_trade"=list(periods=c(10,20,55), series=1:10, size=0.01, moneyRatio=0.02, Units=0,
+#capitals=300000, spreadPercentage=0.001, multi=4, Multi_N=5)
+#periods, moneyRatio, multi, Multi_N, series 需要优化
+#
+#
+#
 require(TTR)
 require(ggplot2)
 maxRows <- 3100 # depends on the row number of series
@@ -26,71 +31,92 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       
       store_data <- data.frame(high=store$Hi[,i], low=store$Lo[,i], close=store$cl[,i])
       N_value <- ATR(store_data, n=params$periods[2], maType=EMA, wilder=TRUE)[,'atr']
-      
-      UnitSize <- as.numeric(trunc((params$size * params$capitals * params$percentage)/(N_value[store$iter] * params$multi)))
-      
+      UnitSize <- as.numeric(trunc((params$size * params$capitals * params$moneyRatio)/(N_value[store$iter] * params$multi)))
+
       # Initiate Long position
       if(as.numeric(store$Hi[store$iter,i]) > as.numeric(storeOfEnEx$Max_En2[store$iter-1,i])){
         
         Units_long <- params$Units + 1
-        pos_long[i] = Units_long * UnitSize
+        pos_long[params$series[i]] = Units_long * UnitSize
+        
         N_long = as.numeric(N_value[store$iter])
-        
         TxnPrice_L = as.numeric(store$cl[store$iter,i])
-        StopPrice_L = TxnPrice_L - 5*N_long
+        StopPrice_L = TxnPrice_L - params$Multi_N * N_long #退出/止损价格
+        StopPrice_L2 = TxnPrice_L - (params$Multi_N-3) * N_long #平部分仓的价格
         
+        # Add to long position   买的加仓情况
+        if(store$Hi[store$iter,i] > ( TxnPrice_L + N_long * (params$Multi_N-2) )) {
+          
+          Units_long = params$Units + 2 #加仓
+          pos_long[params$series[i]] = Units_long * UnitSize
+        }
+  
       }else{
         # Initiate Short position
         if(as.numeric(store$Lo[store$iter,i]) < as.numeric(storeOfEnEx$Min_En2[store$iter-1,i])){
           
           Units_short <- params$Units - 1
-          pos_short[i] = Units_short * UnitSize
+          pos_short[params$series[i]] = Units_short * UnitSize
+          
           N_short = as.numeric(N_value[store$iter])
-          
           TxnPrice_S = as.numeric(store$cl[store$iter,i])
-          StopPrice_S = TxnPrice_S + 5*N_short
+          StopPrice_S = TxnPrice_S + params$Multi_N*N_short #退出/止损价格
+          StopPrice_S2 = TxnPrice_S + (params$Multi_N-3)*N_short #平部分仓的价格
           
-        }
-      }
-      
-      # Position exits and stops �˳���ֹ������  pos != 0 
-      if(( pos_long[params$series[i]] > 0 && ( as.numeric(store$Lo[store$iter,i]) < as.numeric(storeOfEnEx$Min_En1[store$iter-1,i]) || store$Lo[store$iter,i] < StopPrice_L )) || 
-         ( pos_short[params$series[i]] < 0 && ( as.numeric(store$Hi[store$iter,i]) > as.numeric(storeOfEnEx$Max_En1[store$iter-1,i]) || store$Hi[store$iter,i] > StopPrice_S ))) {
-        # addTxn(Portfolio=portfolio, Symbol=symbol, TxnDate=CurrentDate, 
-        #        TxnPrice=ClosePrice, TxnQty = -Posn , TxnFees=0, verbose=verbose)
-        
-        pos_M[i] = -currentPos[i]
-        
-        # updateStrat(Portfolio = portfolio, Symbol = symbol, TxnDate = CurrentDate, 
-        #             PosUnitsQty = 0, UnitSize = UnitSize, StopPrice = NA, 
-        #             TxnPrice = ClosePrice, TxnN = N)
-      }else{
-        # Add to long position   ��ļӲ����
-        if( pos_long[params$series[i]] > 0 && Units_long < params$maxUnits && store$Hi[store$iter,i] > ( TxnPrice_L + N_long * 3 )) {
-
-          Units_long = params$Units + 2
-          pos_long[i] = Units_long * UnitSize
-          N_long = as.numeric(N_value[store$iter])
-
-          TxnPrice_L = as.numeric(store$cl[store$iter,i])
-          StopPrice_L = TxnPrice_L - 5*N_long
-
-        } else{
-          # Add to short position  ���ļӲ����
-          if( pos_short[params$series[i]] > 0 && Units_short < params$maxUnits && store$Lo[store$iter,i] < ( TxnPrice_S - N_short * 3 )) {
-
-            Units_short = params$Units - 2
-            pos_short[i] = Units_short * UnitSize
-            N_short = as.numeric(N_value[store$iter])
-
-            TxnPrice_S = as.numeric(store$cl[store$iter,i])
-            StopPrice_S = TxnPrice_S + 5*N_short
-
+          # Add to short position  卖的加仓情况
+          if(store$Lo[store$iter,i] < ( TxnPrice_S - N_short*(params$Multi_N-2) )) {
+            
+            Units_short = params$Units - 2 #加仓
+            pos_short[params$series[i]] = Units_short * UnitSize
           }
         }
+        
       }
+      # Position exits and stops 退出和止损条件  pos != 0 
+      #平部分仓
+      if(( pos_long[params$series[i]] > 0 && (as.numeric(store$Lo[store$iter,i]) < as.numeric(storeOfEnEx$Min_En1[store$iter-1,i]) || as.numeric(store$Lo[store$iter,i]) < StopPrice_L2) ) ||
+         ( pos_short[params$series[i]] < 0 && (as.numeric(store$Hi[store$iter,i]) > as.numeric(storeOfEnEx$Max_En1[store$iter-1,i]) || as.numeric(store$Hi[store$iter,i]) > StopPrice_S2) )) {
+        # addTxn(Portfolio=portfolio, Symbol=symbol, TxnDate=CurrentDate,
+        #        TxnPrice=ClosePrice, TxnQty = -Posn , TxnFees=0, verbose=verbose)
+        
+        pos_M[params$series[i]] = trunc((-currentPos[i] / 2))
+        # updateStrat(Portfolio = portfolio, Symbol = symbol, TxnDate = CurrentDate,
+        #             PosUnitsQty = 0, UnitSize = UnitSize, StopPrice = NA,
+        #             TxnPrice = ClosePrice, TxnN = N)
+        #全部退出
+        if((pos_long[params$series[i]] > 0 && store$Lo[store$iter,i] < StopPrice_L) || (pos_long[params$series[i]] < 0 && store$Hi[store$iter,i] > StopPrice_S)){
+
+          pos_M[params$series[i]] = -currentPos[i]
+        }
+
+      }
+      # else{
+      #   # Add to long position   买的加仓情况
+      #   if( pos_long[params$series[i]] > 0 && Units_long < params$maxUnits && store$Hi[store$iter,i] > ( TxnPrice_L + N_long * 3 )) {
+      # 
+      #     Units_long = params$Units + 2
+      #     pos_long[params$series[i]] = Units_long * UnitSize
+      #     N_long = as.numeric(N_value[store$iter])
+      # 
+      #     TxnPrice_L = as.numeric(store$cl[store$iter,i])
+      #     StopPrice_L = TxnPrice_L - params$Mutil_N *N_long
+      # 
+      #   } else{
+      #     # Add to short position  卖的加仓情况
+      #     if( pos_short[params$series[i]] > 0 && Units_short < params$maxUnits && store$Lo[store$iter,i] < ( TxnPrice_S - N_short * 3 )) {
+      # 
+      #       Units_short = params$Units - 2
+      #       pos_short[params$series[i]] = Units_short * UnitSize
+      #       N_short = as.numeric(N_value[store$iter])
+      # 
+      #       TxnPrice_S = as.numeric(store$cl[store$iter,i])
+      #       StopPrice_S = TxnPrice_S + params$Mutil_N *N_short
+      # 
+      #     }
+      #   }
+      # }
       
-    }# forѭ���յ�
+    }# for循环终点
     
   }
   
