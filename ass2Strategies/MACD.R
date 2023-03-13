@@ -6,7 +6,7 @@ library(TTR)
 maxRows <- 3100 
 
 #parameters
-#lookback=110,series=1:10,spreadPercentage=0.001,multiple=3,moneyRatio=0.3,riskRatio=0.01,initUnit=10
+#lookback=80,series=1:10,spreadPercentage=0.001,multiple=4,moneyRatio=0.3,riskRatio=0.01,initUnit=30
 
 getOrders <- function(store, newRowList, currentPos, info, params) {
   
