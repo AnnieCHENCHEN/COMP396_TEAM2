@@ -1,3 +1,6 @@
+#This strategy we use two Limit Orders and one Market Order
+#This strategy is based on Momentum strategy with MACD
+#The method that we use to calculate position sizing and stop loss is: ATR indicator
 library(TTR)
 
 maxRows <- 3100 
@@ -21,13 +24,13 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   
   atr <- allzero
   units <- allzero
+  new_units <- allzero
   
   
   if (store$iter > params$lookback) {
     
     for (i in 1:length(params$series)) {
       
-      #Calcaute DIFF and DEA in MACD indicator
       macd_data <- MACD(store$cl[1:store$iter,i],nFast = 12, nSlow = 26, nSig =9, percent = TRUE)
       DIFF <- macd_data[,1]
       DEA <- macd_data[,2]
@@ -43,17 +46,17 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       
       
       #account risk, got 30% of 10000000 in this strategy
-      account_risk = params$riskRatio*params$moneyRatio*info$balance
+      account_risk = params$riskRatio*params$moneyRatio*10000000
       
       # Calculate position size based on account risk
       units[params$series[i]] <- round(account_risk / params$multiple*atr[i])
       
-      #If units <=0 or larger than volume, set position size as inital unit
       if(units[params$series[i]]<=0 || units[params$series[i]]>store$v[store$iter,i]){
-        units[params$series[i]]<- params$initUnit
+        new_units[params$series[i]]<- params$initUnit
       }else{
-        units[params$series[i]]<- units[params$series[i]]
+        new_units[params$series[i]]<- units[params$series[i]]
       }
+      
       
       #Compare MACD line and signal line, get the position signal
       #Entry market conditions
@@ -61,17 +64,17 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       if (DIFF[store$iter]>0 && DEA[store$iter]>0 && DIFF[store$iter]>DEA[store$iter]
           && DIFF[store$iter-1]<DEA[store$iter-1]) {
         
-        #buy,signal= +1, position sizes= 1*units
-        pos1[params$series[i]] <- 1*units[params$series[i]]
+        #sell,signal= -1, position sizes= -1*units
+        pos1[params$series[i]] <- -1*new_units[params$series[i]]
         
         
       }
       else if (DIFF[store$iter]<0 && DEA[store$iter]<0 && DIFF[store$iter]<DEA[store$iter]
                && DIFF[store$iter-1]>DEA[store$iter-1] && currentPos[i] !=0) {
-        #DIFF & DEA <0 & DIFF<DEA & DIFF (yesterday) is bigger than DEA (yesterday) & currentPos has units
+              #DIFF & DEA <0 & DIFF<DEA & DIFF (yesterday) is bigger than DEA (yesterday) & currentPos has units
         
-        #sell, signal= -1, position sizes= -1*units
-        pos2[params$series[i]] <- -1*units[params$series[i]]
+        #buy, signal= +1, position sizes= 1*units
+        pos2[params$series[i]] <- 1*new_units[params$series[i]]
         
       }
       
@@ -90,11 +93,11 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   spread <- sapply(1:length(newRowList),function(i)
     params$spreadPercentage * (newRowList[[i]]$High -newRowList[[i]]$Low))
   
-  limitOrders1  <- pos1 # BUY LIMIT ORDERS
+  limitOrders1  <- pos2 # BUY LIMIT ORDERS
   limitPrices1  <- sapply(1:length(newRowList),function(i) 
     newRowList[[i]]$Close - spread[i]/2)
   
-  limitOrders2  <- pos2# SELL LIMIT ORDERS
+  limitOrders2  <- pos1# SELL LIMIT ORDERS
   limitPrices2  <- sapply(1:length(newRowList),function(i) 
     newRowList[[i]]$Close + spread[i]/2)
   
@@ -174,6 +177,7 @@ updateStore <- function(store, newRowList, series) {
   return(store)
 }
 #***********************update Function ends*************************
+
 
 
 
