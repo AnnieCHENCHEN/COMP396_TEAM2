@@ -1,5 +1,6 @@
 #turtle strategy
-#Parameters : "turtle_trade"=list(periods=c(10,20,55), series=3, size=0.01, moneyRatio=0.02, Units=0,
+#
+#Parameters : "turtle_trade"=list(periods=list(Ex_1=10,En_1=20, En_2=55), series=3, size=0.01, moneyRatio=0.02, Units=0,
 #capi_Ratio=0.3, spreadPercentage=0.001, multi=4, Multi_N=5)
 #
 #####periods, moneyRatio, multi, Multi_N, series, capi_Ratio 需要优化
@@ -25,14 +26,14 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   Units_long <- 0
   Units_short <- 0
   
-  if(store$iter > params$periods[3]){
+  if(store$iter > params$periods$En_2){
     
     storeOfEnEx <- getIndicatorsAndATR(newRowList,params$series,store,params$periods)
     
     for(i in 1:length(params$series)){
       
       store_data <- data.frame(high=store$Hi[,i], low=store$Lo[,i], close=store$cl[,i])
-      N_value <- ATR(store_data, n=params$periods[2], maType=EMA, wilder=TRUE)[,'atr']
+      N_value <- ATR(store_data, n=params$periods$En_1, maType=EMA, wilder=TRUE)[,'atr']
       UnitSize <- as.numeric(trunc((params$size * 1000000 * params$capi_Ratio* params$moneyRatio)/(N_value[store$iter] * params$multi)))
 
       # Initiate SHORT position
@@ -119,14 +120,14 @@ getIndicatorsAndATR <- function(newRowList,series,store,periods){
                       Min_Ex=matrix(0,nrow=maxRows,ncol=length(series)),Max_Ex=matrix(0,nrow=maxRows,ncol=length(series)))
   
   for(i in 1:length(series)){
-    storeOfEnEx$Min_En1[,i] <- runMin(store$Lo[,i], params$periods[2])
-    storeOfEnEx$Max_En1[,i] <- runMax(store$Hi[,i], params$periods[2])
+    storeOfEnEx$Min_En1[,i] <- runMin(store$Lo[,i], params$periods$En_1)
+    storeOfEnEx$Max_En1[,i] <- runMax(store$Hi[,i], params$periods$En_1)
     
-    storeOfEnEx$Min_En2[,i] <- runMin(store$Lo[,i], params$periods[3])
-    storeOfEnEx$Max_En2[,i] <- runMax(store$Hi[,i], params$periods[3])
+    storeOfEnEx$Min_En2[,i] <- runMin(store$Lo[,i], params$periods$En_2)
+    storeOfEnEx$Max_En2[,i] <- runMax(store$Hi[,i], params$periods$En_2)
     
-    storeOfEnEx$Min_Ex[,i] <- runMin(store$Lo[,i], params$periods[1])
-    storeOfEnEx$Max_Ex[,i] <- runMax(store$Hi[,i], params$periods[1])
+    storeOfEnEx$Min_Ex[,i] <- runMin(store$Lo[,i], params$periods$Ex_1)
+    storeOfEnEx$Max_Ex[,i] <- runMax(store$Hi[,i], params$periods$Ex_1)
   }
   return(storeOfEnEx)
 }
