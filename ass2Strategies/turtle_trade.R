@@ -1,9 +1,11 @@
 #turtle strategy
 #Parameters : "turtle_trade"=list(periods=c(10,20,55), series=3, size=0.01, moneyRatio=0.02, Units=0,
 #capi_Ratio=0.3, spreadPercentage=0.001, multi=4, Multi_N=5)
-#periods, moneyRatio, multi, Multi_N, series, capi_Ratio 需要优化
 #
+#####periods, moneyRatio, multi, Multi_N, series, capi_Ratio 需要优化
+#####Multi_N 的优化范围从5开始，不能低于5
 #
+#####做多和做空的位置已调换好
 #
 require(TTR)
 require(ggplot2)
@@ -33,10 +35,10 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       N_value <- ATR(store_data, n=params$periods[2], maType=EMA, wilder=TRUE)[,'atr']
       UnitSize <- as.numeric(trunc((params$size * 1000000 * params$capi_Ratio* params$moneyRatio)/(N_value[store$iter] * params$multi)))
 
-      # Initiate Long position
+      # Initiate SHORT position
       if(as.numeric(store$Hi[store$iter,i]) > as.numeric(storeOfEnEx$Max_En2[store$iter-1,i])){
         
-        Units_long <- params$Units + 1
+        Units_long <- params$Units - 1
         pos_long[params$series[i]] = Units_long * UnitSize
         
         N_long = as.numeric(N_value[store$iter])
@@ -44,18 +46,18 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         StopPrice_L = TxnPrice_L - params$Multi_N * N_long #退出/止损价格
         StopPrice_L2 = TxnPrice_L - (params$Multi_N-3) * N_long #平部分仓的价格
         
-        # Add to long position   买的加仓情况
+        # Add to SHORT position   
         if(store$Hi[store$iter,i] > ( TxnPrice_L + N_long * (params$Multi_N-2) )) {
           
-          Units_long = params$Units + 2 #加仓
+          Units_long = params$Units - 2 #加仓
           pos_long[params$series[i]] = Units_long * UnitSize
         }
   
       }else{
-        # Initiate Short position
+        # Initiate LONG position
         if(as.numeric(store$Lo[store$iter,i]) < as.numeric(storeOfEnEx$Min_En2[store$iter-1,i])){
           
-          Units_short <- params$Units - 1
+          Units_short <- params$Units + 1
           pos_short[params$series[i]] = Units_short * UnitSize
           
           N_short = as.numeric(N_value[store$iter])
@@ -63,10 +65,10 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
           StopPrice_S = TxnPrice_S + params$Multi_N*N_short #退出/止损价格
           StopPrice_S2 = TxnPrice_S + (params$Multi_N-3)*N_short #平部分仓的价格
           
-          # Add to short position  卖的加仓情况
+          # Add to LONG position
           if(store$Lo[store$iter,i] < ( TxnPrice_S - N_short*(params$Multi_N-2) )) {
             
-            Units_short = params$Units - 2 #加仓
+            Units_short = params$Units + 2 #加仓
             pos_short[params$series[i]] = Units_short * UnitSize
           }
         }
@@ -90,31 +92,6 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         }
 
       }
-      # else{
-      #   # Add to long position   买的加仓情况
-      #   if( pos_long[params$series[i]] > 0 && Units_long < params$maxUnits && store$Hi[store$iter,i] > ( TxnPrice_L + N_long * 3 )) {
-      # 
-      #     Units_long = params$Units + 2
-      #     pos_long[params$series[i]] = Units_long * UnitSize
-      #     N_long = as.numeric(N_value[store$iter])
-      # 
-      #     TxnPrice_L = as.numeric(store$cl[store$iter,i])
-      #     StopPrice_L = TxnPrice_L - params$Mutil_N *N_long
-      # 
-      #   } else{
-      #     # Add to short position  卖的加仓情况
-      #     if( pos_short[params$series[i]] > 0 && Units_short < params$maxUnits && store$Lo[store$iter,i] < ( TxnPrice_S - N_short * 3 )) {
-      # 
-      #       Units_short = params$Units - 2
-      #       pos_short[params$series[i]] = Units_short * UnitSize
-      #       N_short = as.numeric(N_value[store$iter])
-      # 
-      #       TxnPrice_S = as.numeric(store$cl[store$iter,i])
-      #       StopPrice_S = TxnPrice_S + params$Mutil_N *N_short
-      # 
-      #     }
-      #   }
-      # }
       
     }# for循环终点
     
