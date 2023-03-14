@@ -10,7 +10,7 @@ example_strategies <- c("fixed",
                         "simple_limit",
                         "extreme_limit",
                         "meanReversion",
-                        "Momentum4",
+                        "Momentum2",
                         "MACD",
                         "turtle_trade"
 )
@@ -28,7 +28,7 @@ example_params <- list(
   "simple_limit"=list(spreadPercentage=0.001,inventoryLimits=rep(10,10)),
   "extreme_limit"=list(spreadPercentage=0.001,inventoryLimits=rep(10,10)),
   "meanReversion"=list(lookback=20,sdParam=1.5,series=1,posSizes=rep(1,10), profit_target=50000),
-  "Momentum4" =list(lookbacks=list(short=as.integer(5),medium=as.integer(10),long=as.integer(20)),sdParam=1.5,series=1:10,posSizes=rep(1,10)),
+  "Momentum2" =list(lookbacks=list(short=as.integer(15),medium=as.integer(40),long=as.integer(90)),series=1:10,stopRatio=0.3,riskPortion=0.001,riskPerShare=4,spreadPercentage=0.001),
   "MACD" = list(lookback=80,series=1:10,spreadPercentage=0.001,
                 multiple=4,moneyRatio=0.3,riskRatio=0.01,initUnit=30),
   "turtle_trade"=list(periods=list(Ex_1=10,En_1=20, En_2=55), series=3, size=0.01, moneyRatio=0.02, Units=0,
