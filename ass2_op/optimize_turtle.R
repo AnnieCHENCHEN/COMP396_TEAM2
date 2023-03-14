@@ -23,15 +23,14 @@ dataList <- lapply(dataList, function(x) x[1:numOfDays])
 ######################################################################
 sMult <- 0.2 # slippage multiplier
 # in-sample parameters
-periods_short <- c(10,20,30,40,50,60,70,80)
-periods_med <- c(20,30,40,50.60,70,80,90)
-periods_long <- c(35,40,45,50,55,60,65,70,75,80)
+periods_short <- seq(from=10, to=50, by=5)
+periods_med <- seq(from=15,to=60,by=5)
+periods_long <- seq(from=40, to=90,by=5)
 Multi_N <- seq(from=5, to=10, by=1)
-multi <- seq(from=3, to=10, by=1)
+multi <- seq(from=3, to=5, by=0.5)
 capi_Ratio <- seq(from=0.3,to=0.7,by=0.1)
 spreadPercentage=0.001
-moneyRatio =0.02
-series_com <- list(t(combn(1:10,4))) #randomly pick 4 series as a group to optimize
+moneyRatio =seq(from=0.02,to=0.05,by=0.01)
 
 #out-sample parameters
 #lookbackSeq
