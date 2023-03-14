@@ -11,7 +11,8 @@ example_strategies <- c("fixed",
                         "extreme_limit",
                         "meanReversion",
                         "Momentum4",
-                        "MACD"
+                        "MACD",
+                        "turtle_trade"
 )
 
 example_params <- list(
@@ -28,8 +29,10 @@ example_params <- list(
   "extreme_limit"=list(spreadPercentage=0.001,inventoryLimits=rep(10,10)),
   "meanReversion"=list(lookback=20,sdParam=1.5,series=1,posSizes=rep(1,10), profit_target=50000),
   "Momentum4" =list(lookbacks=list(short=as.integer(5),medium=as.integer(10),long=as.integer(20)),sdParam=1.5,series=1:10,posSizes=rep(1,10)),
-  "MACD" = list(lookback=50,series=1,spreadPercentage=0.001,
-                multiple=1,moneyRatio=0.3,riskRatio=0.02,initUnit=5)
+  "MACD" = list(lookback=80,series=1:10,spreadPercentage=0.001,
+                multiple=4,moneyRatio=0.3,riskRatio=0.01,initUnit=30),
+  "turtle_trade"=list(periods=list(Ex_1=10,En_1=20, En_2=55), series=3, size=0.01, moneyRatio=0.02, Units=0,
+                      capi_Ratio=0.3, spreadPercentage=0.001, multi=4, Multi_N=5)
 )
 
 load_strategy <- function(strategy) {
