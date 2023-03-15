@@ -23,13 +23,13 @@ dataList <- lapply(dataList, function(x) x[1:numOfDays])
 ######################################################################
 sMult <- 0.2 # slippage multiplier
 # in-sample parameters
-lookbackSeq <- as.integer(c(50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200))
-multiple <- seq(from=1, to=5, by=1)
+lookbackSeq <- seq(from=50,to=110,by=20)
+multiple <- seq(from=2, to=4, by=1)
 riskRatio <- c(0.01,0.02)
-initUnit <- as.integer(c(5,10,15,25,35,45))
+initUnit <- as.integer(c(5,15,35))
 spreadPercentage=0.001
-moneyRatio <-seq(from=0.1,to=0.5,by=0.1)
-#series_com <- list(t(combn(1:10,4))) #randomly pick 4 series as a group to optimize
+moneyRatio <-0.3
+series_com <- t(combn(1:10,4)) #randomly pick 4 series as a group to optimize
 
 #out-sample parameters
 #lookbackSeq
@@ -42,20 +42,27 @@ moneyRatio <-seq(from=0.1,to=0.5,by=0.1)
 params_comb <- expand.grid(lookback=lookbackSeq,mul=multiple, Ratio=riskRatio,unit=initUnit,
                            spread=spreadPercentage,money=moneyRatio)
 
-resultsMatrix <- matrix(nrow=nrow(params_comb),ncol=6)
-colnames(resultsMatrix) <- c("lookback","multiple","riskRatio","initUnit","moneyRatio","PD Ratio")
+# Create a data frame for the series combinations
+series_df <- as.data.frame(series_com)
+colnames(series_df) <- paste0("series_", 1:4)
+
+# Combine the parameter grid with the series combinations
+params_comb <- merge(params_comb, series_df, all=TRUE)
+
+resultsMatrix <- matrix(nrow=nrow(params_comb),ncol=10)
+colnames(resultsMatrix) <- c("lookback","multiple","riskRatio","initUnit","moneyRatio","series_use1","series_use2","series_use3","series_use4","PD Ratio")
 pfolioPnLList <- vector(mode="list",length=nrow(params_comb)) 
 print(nrow(params_comb))
 
 for (i in 1:nrow(params_comb)) {
   params <- list(lookback=params_comb$lookback[[i]],multiple=params_comb$mul[[i]],spreadPercentage=params_comb$spread[[i]],
-                 moneyRatio=params_comb$money[[i]],riskRatio=params_comb$Ratio[[i]],initUnit=params_comb$unit[[i]],series=1:10) 
+                 moneyRatio=params_comb$money[[i]],riskRatio=params_comb$Ratio[[i]],initUnit=params_comb$unit[[i]],series=as.numeric(params_comb[, paste0("series_", 1:4)][i, ])) 
   results <- backtest(dataList, getOrders, params, sMult)
   pfolioPnL <- plotResults(dataList,results)
   
   # Do backtest
   resultsMatrix[i,] <- c(params_comb$lookback[[i]],params_comb$mul[[i]],params_comb$Ratio[[i]],
-                         params_comb$unit[[i]],params_comb$money[[i]],pfolioPnL$fitAgg)
+                         params_comb$unit[[i]],params_comb$money[[i]],as.numeric(params_comb[, paste0("series_", 1:4)][i, ]),pfolioPnL$fitAgg)
   
   pfolioPnLList[[i]]<- pfolioPnL
   cat("Just completed",i,"out of",nrow(params_comb),"\n")
