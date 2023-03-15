@@ -6,7 +6,7 @@ library(TTR)
 maxRows <- 3100 
 
 #parameters
-#lookback=80,series=1:10,spreadPercentage=0.001,multiple=4,moneyRatio=0.3,riskRatio=0.01,initUnit=30
+#lookback=110,series=1:10,spreadPercentage=0.001,multiple=3,moneyRatio=0.3,riskRatio=0.01,initUnit=10
 
 getOrders <- function(store, newRowList, currentPos, info, params) {
   
@@ -114,10 +114,6 @@ initClStore  <- function(newRowList,series) {
   clStore <- matrix(0,nrow=maxRows,ncol=length(series))
   return(clStore)
 }
-initOpStore  <- function(newRowList,series) {
-  OpStore <- matrix(0,nrow=maxRows,ncol=length(series))
-  return(OpStore)
-}
 initHiStore  <- function(newRowList,series) {
   HiStore <- matrix(0,nrow=maxRows,ncol=length(series))
   return(HiStore)
@@ -142,11 +138,6 @@ initStore <- function(newRowList,series) {
 
 
 #***********************update Function starts*************************
-updateOpStore <- function(OpStore, newRowList, series, iter) {
-  for (i in 1:length(series))
-    OpStore[iter,i] <- as.numeric(newRowList[[series[i]]]$Open)
-  return(OpStore)
-}
 updateHiStore <- function(HiStore, newRowList, series, iter) {
   for (i in 1:length(series))
     HiStore[iter,i] <- as.numeric(newRowList[[series[i]]]$High)
@@ -169,7 +160,6 @@ updateClStore <- function(clStore, newRowList, series, iter) {
 }
 updateStore <- function(store, newRowList, series) {
   store$iter <- store$iter + 1
-  store$o <- updateOpStore(store$o,newRowList,series,store$iter)
   store$h <- updateHiStore(store$h,newRowList,series,store$iter)
   store$l <- updateLoStore(store$l,newRowList,series,store$iter)
   store$cl <- updateClStore(store$cl,newRowList,series,store$iter)
@@ -177,7 +167,5 @@ updateStore <- function(store, newRowList, series) {
   return(store)
 }
 #***********************update Function ends*************************
-
-
 
 
