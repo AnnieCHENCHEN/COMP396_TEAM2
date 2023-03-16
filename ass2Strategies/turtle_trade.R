@@ -31,7 +31,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
     for(i in 1:length(params$series)){
       
       store_data <- data.frame(high=store$Hi[,i], low=store$Lo[,i], close=store$cl[,i])
-      N_value <- ATR(store_data, n=params$periods$En_1, maType=EMA, wilder=TRUE)[,'atr']
+      N_value <- ATR(store_data, n=20, maType=EMA, wilder=TRUE)[,'atr']
       UnitSize <- as.numeric(trunc((params$size * 1000000 * params$capi_Ratio* params$moneyRatio)/(N_value[store$iter] * params$multi)))
       
       # Initiate SHORT position
