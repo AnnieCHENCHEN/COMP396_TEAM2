@@ -46,10 +46,10 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
     ######## Turtle Trade 3 lines ########
     storeOfEnEx <- getIndicatorsAndATR(newRowList,params$series,store,params$periods)
     
-    for(i in params$series) {
+    for(i in 1:length(params$series)) {
       
       #### calculate ATR value for MACD and Turtle Trade
-      store_data <- data.frame(high=store$Hi[,i], low=store$Lo[,i], close=store$cl[,i])
+      store_data <- data.frame(High=store$Hi[,i], Low=store$Lo[,i], Close=store$cl[,i])
       N_value <- ATR(store_data, n=20, maType=EMA, wilder=TRUE)[,'atr']
 
       #-------------------------Turtle Trade Strategy----------------------#
@@ -57,19 +57,19 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         
         UnitSize <- as.numeric(trunc((params$size * 1000000 * params$capi_Ratio* params$unitRatio)/(N_value[store$iter] * params$multi)))
         # Initiate SHORT position
-        if(as.numeric(store$Hi[store$iter,i]) > as.numeric(storeOfEnEx$Max_En2[store$iter-1,i])){
+        if(store$Hi[store$iter,i] > storeOfEnEx$Max_En2[store$iter-1,i]){
           
           pos_short[params$series[i]] = -1 * UnitSize
           
           N_short = as.numeric(N_value[store$iter])
           TxnPrice_S = as.numeric(store$cl[store$iter,i])
-          StopPrice_S = TxnPrice_S - params$Multi_N * N_short #退出/止损价格
-          StopPrice_S2 = TxnPrice_S - (params$Multi_N-3) * N_short #平部分仓的价格
+          StopPrice_S = TxnPrice_S - params$Multi_N * N_short #?顺?/止???鄹?
+          StopPrice_S2 = TxnPrice_S - (params$Multi_N-3) * N_short #平???植值募鄹?
           
           # Add to SHORT position   
           if(store$Hi[store$iter,i] > ( TxnPrice_S + N_short * (params$Multi_N-2) )) {
             
-            pos_short[params$series[i]] = -2 * UnitSize #加仓
+            pos_short[params$series[i]] = -2 * UnitSize #?硬?
           }
         }else{
           # Initiate LONG position
@@ -79,18 +79,18 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
             
             N_long = as.numeric(N_value[store$iter])
             TxnPrice_L = as.numeric(store$cl[store$iter,i])
-            StopPrice_L = TxnPrice_L + params$Multi_N*N_long #退出/止损价格
-            StopPrice_L2 = TxnPrice_L + (params$Multi_N-3)*N_long #平部分仓的价格
+            StopPrice_L = TxnPrice_L + params$Multi_N*N_long #?顺?/止???鄹?
+            StopPrice_L2 = TxnPrice_L + (params$Multi_N-3)*N_long #平???植值募鄹?
             
             # Add to LONG position
             if(store$Lo[store$iter,i] < ( TxnPrice_L - N_long*(params$Multi_N-2) )) {
               
-              pos_long[params$series[i]] = 2 * UnitSize#加仓
+              pos_long[params$series[i]] = 2 * UnitSize#?硬?
             }
           }
         }
-        # Position exits and stops 退出和止损条件  pos != 0 
-        #平部分仓
+        # Position exits and stops ?顺???止??????  pos != 0 
+        #平???植?
         if(( pos_short[params$series[i]] < 0 && (as.numeric(store$Lo[store$iter,i]) < as.numeric(storeOfEnEx$Min_En1[store$iter-1,i]) || as.numeric(store$Lo[store$iter,i]) < StopPrice_S2) ) ||
            ( pos_long[params$series[i]] > 0 && (as.numeric(store$Hi[store$iter,i]) > as.numeric(storeOfEnEx$Max_En1[store$iter-1,i]) || as.numeric(store$Hi[store$iter,i]) > StopPrice_L2) )) {
           # addTxn(Portfolio=portfolio, Symbol=symbol, TxnDate=CurrentDate,
@@ -100,7 +100,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
           # updateStrat(Portfolio = portfolio, Symbol = symbol, TxnDate = CurrentDate,
           #             PosUnitsQty = 0, UnitSize = UnitSize, StopPrice = NA,
           #             TxnPrice = ClosePrice, TxnN = N)
-          #全部退出
+          #全???顺?
           if((pos_short[params$series[i]] < 0 && store$Lo[store$iter,i] < StopPrice_S) || (pos_long[params$series[i]] > 0 && store$Hi[store$iter,i] > StopPrice_L)){
             
             pos_M[params$series[i]] = -currentPos[i]
@@ -144,6 +144,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
           
           pos_short[params$series[i]] <- -1*units[params$series[i]] #sell, -1
         }
+        
         #----Exit market----if store$cl[store$iter,i]<=stop_price[i], we trade units that we have as market order. 
         else if (store$cl[store$iter-1,i]>Bstop_price[i] && store$cl[store$iter,i]<=Bstop_price[i]
                  ||store$cl[store$iter,i]>=Sstop_price[params$series[i]] && currentPos[i]>=0){ 
@@ -153,11 +154,12 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       }
       
       if(i == 2 || i == 4){
+        if(store$iter  > params$lookbacks$long){
         #-------------------------TMA Strategy----------------------#
         # get positioin sizing. We calculate the position size with the close price
         #get a list:each column stores returns for each series and calculate the mean value for each series
-        CloseDiffs <- diff(store$cl)
-        absCloseDiffs    <- matrix(abs(CloseDiffs),ncol = length(params$series),byrow=TRUE)
+        CloseDiffs <- as.numeric(diff(store$cl))
+        absCloseDiffs    <- matrix(as.numeric(abs(CloseDiffs)),ncol = length(params$series),byrow=TRUE)
         
         # Calculate the column means for non-zero elements and find the largest mean value
         avgAbsDiffs <- apply(absCloseDiffs, 2, function(x) mean(x[x > 0]))
@@ -188,7 +190,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         #   sma <- SMA(store$cl[1:store$iter,i], n = params$lookbacks[[m]])
         #   tma_list [m] = as.numeric(sma[length(sma)])
         # }
-        TMA_list <- getTMAIndicators(params$lookbacks,store$cl[,i])
+        TMA_list <- getTMAIndicators(store$cl[1:store$iter,i],params$lookbacks)
         
         ###get trade signal and position according to TMA ratio
         if (TMA_list$short < TMA_list$medium && TMA_list$medium < TMA_list$long){
@@ -206,6 +208,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         }
       }
       
+    }
     }
   }
   
@@ -228,13 +231,13 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
 }
 
 ################# get TMA ratio ###########################
-getTMAIndicators <- function(loockbacks,prices){
+getTMAIndicators <- function(prices,lookbacks){
   
   TMA_list = list(short = 0, medium = 0, long = 0)
   
-  for (i in 1 : length(params$lookbacks)){
+  for (i in 1 : length(lookbacks)){
     #calculate SMA for each lookbacks
-    sma <- SMA(prices$cl, n = params$lookbacks[[i]])
+    sma <- SMA(prices, n =lookbacks[[i]])
     TMA_list[i] = as.numeric(sma[length(sma)])
   }
   return(TMA_list)
@@ -247,7 +250,7 @@ getIndicatorsAndATR <- function(newRowList,series,store,periods){
                       Min_En2=matrix(0,nrow=maxRows,ncol=10),Max_En2=matrix(0,nrow=maxRows,ncol=10),
                       Min_Ex=matrix(0,nrow=maxRows,ncol=10),Max_Ex=matrix(0,nrow=maxRows,ncol=10))
   
-  for(i in series){
+  for(i in 1:length(series)){
     storeOfEnEx$Min_En1[,i] <- runMin(store$Lo[,i], params$periods$En_1)
     storeOfEnEx$Max_En1[,i] <- runMax(store$Hi[,i], params$periods$En_1)
     
@@ -256,57 +259,58 @@ getIndicatorsAndATR <- function(newRowList,series,store,periods){
     
     storeOfEnEx$Min_Ex[,i] <- runMin(store$Lo[,i], params$periods$Ex_1)
     storeOfEnEx$Max_Ex[,i] <- runMax(store$Hi[,i], params$periods$Ex_1)
-  }
+  
+}
   return(storeOfEnEx)
 }
 ############################ intiate #######################
 initHiStore  <- function(newRowList,series) {
-  HiStore <- matrix(0,nrow=maxRows,ncol=length(series)+4)
+  HiStore <- matrix(0,nrow=maxRows,ncol=length(series))
   return(HiStore)
 }
 initLoStore  <- function(newRowList,series) {
-  LoStore <- matrix(0,nrow=maxRows,ncol=length(series)+4)
+  LoStore <- matrix(0,nrow=maxRows,ncol=length(series))
   return(LoStore)
 }
 initClStore  <- function(newRowList,series) {
-  clStore <- matrix(0,nrow=maxRows,ncol=length(series)+4)
+  clStore <- matrix(0,nrow=maxRows,ncol=length(series))
   return(clStore)
 }
 initVolStore  <- function(newRowList,series) {
-  VolStore <- matrix(0,nrow=maxRows,ncol=length(series)+4)
+  VolStore <- matrix(0,nrow=maxRows,ncol=length(series))
   return(VolStore)
 }
 ##################### update ##############################
 updateHiStore <- function(HiStore, newRowList, series, iter){
-  for (i in series)
+  for (i in 1:length(series))
     HiStore[iter,i] <- as.numeric(newRowList[[series[i]]]$High)
   return(HiStore)
 }
 updateLoStore <- function(LoStore, newRowList, series, iter){
-  for (i in series)
+  for (i in 1:length(series))
     LoStore[iter,i] <- as.numeric(newRowList[[series[i]]]$Low)
   return(LoStore)
 }
 updateClStore <- function(clStore, newRowList, series, iter) {
-  for (i in series)
+  for (i in 1:length(series))
     clStore[iter,i] <- as.numeric(newRowList[[series[i]]]$Close)
   return(clStore)
 }
-updateVolStore <- function(clStore, newRowList, series, iter) {
-  for (i in series)
+updateVolStore <- function(VolStore, newRowList, series, iter) {
+  for (i in 1:length(series))
     VolStore[iter,i] <- as.numeric(newRowList[[series[i]]]$Volume)
   return(VolStore)
 }
 ############# initate and update store ####################
 initStore <- function(newRowList,series) {
   return(list(iter=0,Hi=initHiStore(newRowList,series), Lo=initLoStore(newRowList,series), 
-              Cl=initClStore(newRowList,series), Vol=initVolStore(newRowList,series)))
+              cl=initClStore(newRowList,series), Vol=initVolStore(newRowList,series)))
 }
 updateStore <- function(store, newRowList, series, params) {
   store$iter <- store$iter + 1
   store$Hi <- updateHiStore(store$Hi,newRowList,series,store$iter)
   store$Lo <- updateLoStore(store$Lo,newRowList,series,store$iter)
-  store$Cl <- updateClStore(store$cl,newRowList,series,store$iter)
+  store$cl <- updateClStore(store$cl,newRowList,series,store$iter)
   store$Vol <- updateVolStore(store$Vol,newRowList,series,store$iter)
   
   return(store)
