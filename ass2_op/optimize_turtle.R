@@ -3,7 +3,7 @@ source('framework/backtester.R')
 source('framework/processResults.R'); 
 source('strategies/turtle_trade.R') 
 
-sink("optim/opti_Turtle.txt")
+#sink("optim/opti_Turtle.txt")
 
 #training days = 500  validation days = 250  testing days = 250
 #split data into 3 parts
@@ -23,12 +23,12 @@ dataList <- lapply(dataList, function(x) x[1:numOfDays])
 ######################################################################
 sMult <- 0.2 # slippage multiplier
 # in-sample parameters
-periods_short <- seq(from=10, to=50, by=5)
-periods_med <- seq(from=15,to=60,by=5)
-periods_long <- seq(from=40, to=90,by=5)
-Multi_N <- seq(from=5, to=10, by=1)
-multi <- seq(from=3, to=5, by=0.5)
-capi_Ratio <- seq(from=0.3,to=0.7,by=0.1)
+periods_short <- seq(from=10, to=50, by=20)
+periods_med <- seq(from=15,to=45,by=20)
+periods_long <- seq(from=40, to=80,by=20)
+Multi_N <- seq(from=5, to=15, by=5)
+multi <- seq(from=3, to=5, by=1)
+capi_Ratio =0.3
 spreadPercentage=0.001
 moneyRatio =seq(from=0.02,to=0.05,by=0.01)
 series_com <- t(combn(1:10,4)) #randomly pick 4 series as a group to optimize
@@ -73,4 +73,4 @@ for (i in 1:nrow(params_comb)) {
   print(resultsMatrix[i,])
 }
 print(resultsMatrix[order(resultsMatrix[,"PD Ratio"],decreasing = TRUE),])
-sink()
+#sink()
