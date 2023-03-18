@@ -24,9 +24,9 @@ dataList <- lapply(dataList, function(x) x[1:numOfDays])
 sMult <- 0.2 # slippage multiplier
 # in-sample parameters
 periods_short <- seq(from=10, to=50, by=20)
-periods_med <- seq(from=15,to=45,by=20)
+periods_med <- seq(from=15,to=55,by=20)
 periods_long <- seq(from=40, to=80,by=20)
-Multi_N <- seq(from=5, to=15, by=5)
+Multi_N <- seq(from=5, to=10, by=5)
 multi <- seq(from=3, to=5, by=1)
 capi_Ratio =0.3
 spreadPercentage=0.001
@@ -63,7 +63,7 @@ for (i in 1:nrow(params_comb)) {
   pfolioPnL <- plotResults(dataList,results)
   
   # Do backtest
-  if(all(params_comb$ex_1[[i]] < params_comb$en_1[[i]] && params_comb$en_1[[i]] <params_comb$en_2[[i]]) == TRUE){
+  if(params_comb$ex_1[[i]] < params_comb$en_1[[i]] && params_comb$en_1[[i]] <params_comb$en_2[[i]]){
   resultsMatrix[i,] <- c(params_comb$ex_1[[i]],params_comb$en_1[[i]],params_comb$en_2[[i]],params_comb$mul[[i]],params_comb$Ratio[[i]],
                          params_comb$mutiple[[i]],captial=params_comb$money[[i]],as.numeric(params_comb[, paste0("series_", 1:4)][i, ]),pfolioPnL$fitAgg)
   
