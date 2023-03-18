@@ -1,7 +1,7 @@
 source('framework/data.R'); 
 source('framework/backtester.R')
 source('framework/processResults.R'); 
-source('strategies/turtle_trade.R') 
+source('ass2Strategies/turtle_trade.R') 
 
 #sink("optim/opti_Turtle.txt")
 
