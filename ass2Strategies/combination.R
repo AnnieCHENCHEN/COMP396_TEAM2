@@ -63,13 +63,13 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
           
           N_short = as.numeric(N_value[store$iter])
           TxnPrice_S = as.numeric(store$cl[store$iter,i])
-          StopPrice_S = TxnPrice_S - params$Multi_N * N_short #ÍË³ö/Ö¹Ëð¼Û¸ñ
-          StopPrice_S2 = TxnPrice_S - (params$Multi_N-3) * N_short #Æ½²¿·Ö²ÖµÄ¼Û¸ñ
+          StopPrice_S = TxnPrice_S - params$Multi_N * N_short #é€€å‡º/æ­¢æŸä»·æ ¼
+          StopPrice_S2 = TxnPrice_S - (params$Multi_N-3) * N_short #å¹³éƒ¨åˆ†ä»“çš„ä»·æ ¼
           
           # Add to SHORT position   
           if(store$Hi[store$iter,i] > ( TxnPrice_S + N_short * (params$Multi_N-2) )) {
             
-            pos_short[params$series[i]] = -2 * UnitSize #¼Ó²Ö
+            pos_short[params$series[i]] = -2 * UnitSize #åŠ ä»“
           }
         }else{
           # Initiate LONG position
@@ -79,18 +79,18 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
             
             N_long = as.numeric(N_value[store$iter])
             TxnPrice_L = as.numeric(store$cl[store$iter,i])
-            StopPrice_L = TxnPrice_L + params$Multi_N*N_long #ÍË³ö/Ö¹Ëð¼Û¸ñ
-            StopPrice_L2 = TxnPrice_L + (params$Multi_N-3)*N_long #Æ½²¿·Ö²ÖµÄ¼Û¸ñ
+            StopPrice_L = TxnPrice_L + params$Multi_N*N_long #é€€å‡º/æ­¢æŸä»·æ ¼
+            StopPrice_L2 = TxnPrice_L + (params$Multi_N-3)*N_long #å¹³éƒ¨åˆ†ä»“çš„ä»·æ ¼
             
             # Add to LONG position
             if(store$Lo[store$iter,i] < ( TxnPrice_L - N_long*(params$Multi_N-2) )) {
               
-              pos_long[params$series[i]] = 2 * UnitSize#¼Ó²Ö
+              pos_long[params$series[i]] = 2 * UnitSize#åŠ ä»“
             }
           }
         }
-        # Position exits and stops ÍË³öºÍÖ¹ËðÌõ¼þ  pos != 0 
-        #Æ½²¿·Ö²Ö
+        # Position exits and stops é€€å‡ºå’Œæ­¢æŸæ¡ä»¶  pos != 0 
+        #å¹³éƒ¨åˆ†ä»“
         if(( pos_short[params$series[i]] < 0 && (as.numeric(store$Lo[store$iter,i]) < as.numeric(storeOfEnEx$Min_En1[store$iter-1,i]) || as.numeric(store$Lo[store$iter,i]) < StopPrice_S2) ) ||
            ( pos_long[params$series[i]] > 0 && (as.numeric(store$Hi[store$iter,i]) > as.numeric(storeOfEnEx$Max_En1[store$iter-1,i]) || as.numeric(store$Hi[store$iter,i]) > StopPrice_L2) )) {
           # addTxn(Portfolio=portfolio, Symbol=symbol, TxnDate=CurrentDate,
@@ -100,7 +100,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
           # updateStrat(Portfolio = portfolio, Symbol = symbol, TxnDate = CurrentDate,
           #             PosUnitsQty = 0, UnitSize = UnitSize, StopPrice = NA,
           #             TxnPrice = ClosePrice, TxnN = N)
-          #È«²¿ÍË³ö
+          #å…¨éƒ¨é€€å‡º
           if((pos_short[params$series[i]] < 0 && store$Lo[store$iter,i] < StopPrice_S) || (pos_long[params$series[i]] > 0 && store$Hi[store$iter,i] > StopPrice_L)){
             
             pos_M[params$series[i]] = -currentPos[i]
@@ -124,7 +124,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         account_risk = params$riskRatio*params$moneyRatio*10000000
         
         # Calculate position size based on account risk
-        units[params$series[i]] <- round(account_risk / params$multiple*N_value[store$iter])
+        units[params$series[i]] <- round(account_risk / (params$multiple*N_value[store$iter]))
         
         if(units[params$series[i]]<=0 || units[params$series[i]]>store$Vol[store$iter,i]){
           units[params$series[i]]<- 50
