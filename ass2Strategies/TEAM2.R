@@ -113,7 +113,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         account_risk = params$riskRatio*params$moneyRatio*10000000
 
         # Calculate position size based on account risk
-        units[params$series[i]] <- round(account_risk / params$multiple*N_value[store$iter])
+        units[params$series[i]] <- round(account_risk / (params$multiple*N_value[store$iter]))
 
         if(units[params$series[i]]<=0 || units[params$series[i]]>store$Vol[store$iter,i]){
           units[params$series[i]]<- 50
