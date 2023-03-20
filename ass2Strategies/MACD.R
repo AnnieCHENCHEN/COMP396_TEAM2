@@ -49,7 +49,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       account_risk = params$riskRatio*params$moneyRatio*10000000
       
       # Calculate position size based on account risk
-      units[params$series[i]] <- round(account_risk / params$multiple*atr[i])
+      units[params$series[i]] <- round(account_risk / (params$multiple*atr[i]))
       
       if(units[params$series[i]]<=0 || units[params$series[i]]>store$v[store$iter,i]){
         new_units[params$series[i]]<- params$initUnit
@@ -129,7 +129,7 @@ initVoStore  <- function(newRowList,series) {
 initStore <- function(newRowList,series) {
   return(list(iter=0,cl=initClStore(newRowList,series),
               h = initHiStore(newRowList,series),l = initLoStore(newRowList,series),
-              o = initOpStore(newRowList,series),v = initVoStore(newRowList,series)))
+              v = initVoStore(newRowList,series)))
 }
 #***********************init Function ends*************************
 
