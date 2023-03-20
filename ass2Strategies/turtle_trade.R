@@ -33,11 +33,11 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       store_data <- data.frame(high=store$Hi[,i], low=store$Lo[,i], close=store$cl[,i])
       N_value <- ATR(store_data, n=20, maType=EMA, wilder=TRUE)[,'atr']
       UnitSize <- as.numeric(trunc((params$size * 1000000 * params$capi_Ratio* params$moneyRatio)/(N_value[store$iter] * params$multi)))
-      
+
       # Initiate SHORT position
       if(as.numeric(store$Hi[store$iter,i]) > as.numeric(storeOfEnEx$Max_En2[store$iter-1,i])){
         
-        pos_short[params$series[i]] = -1 * UnitSize
+        pos_short[params$series[i]] = -1 * ceiling(UnitSize/2)
         
         N_short = as.numeric(N_value[store$iter])
         TxnPrice_S = as.numeric(store$cl[store$iter,i])
@@ -53,7 +53,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         # Initiate LONG position
         if(as.numeric(store$Lo[store$iter,i]) < as.numeric(storeOfEnEx$Min_En2[store$iter-1,i])){
           
-          pos_long[params$series[i]] = 1 * UnitSize
+          pos_long[params$series[i]] = 1 * ceiling(UnitSize/2)
           
           N_long = as.numeric(N_value[store$iter])
           TxnPrice_L = as.numeric(store$cl[store$iter,i])
@@ -101,7 +101,9 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   limitPrices2  <- sapply(1:length(newRowList),function(i) 
     newRowList[[i]]$Close + spread[i]/2)
   
-  return(list(store=store,marketOrders=pos_M,
+  marketOrders <- pos_M
+  
+  return(list(store=store,marketOrders=marketOrders,
               limitOrders1=limitOrders1,limitPrices1=limitPrices1,
               limitOrders2=limitOrders2,limitPrices2=limitPrices2))
 }
