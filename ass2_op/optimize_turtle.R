@@ -44,11 +44,19 @@ for (i in 1:nrow(params_comb)) {
   params <- list(periods=list(Ex_1=params_comb$ex_1[[i]],
                               En_1=params_comb$en_1[[i]],
                               En_2=params_comb$en_2[[i]]),
-                 mutilN=params_comb$mul[[i]],
-                 moneyR=params_comb$Ratio[[i]],
-                 mutiple=params_comb$mutiple[[i]],
+                 ##########
+                 size=0.01,
+
+                 ##########
+                 # mutilN=params_comb$mul[[i]],
+                 Multi_N=params_comb$mul[[i]],
+                 # moneyR=params_comb$Ratio[[i]],
+                 moneyRatio=params_comb$Ratio[[i]],
+                 # mutiple=params_comb$mutiple[[i]],
+                 multi=params_comb$mutiple[[i]],
                  spreadPercentage=params_comb$spread[[i]],
-                 captial=params_comb$money[[i]],
+                 # captial=params_comb$money[[i]],
+                 capi_Ratio=params_comb$money[[i]],
                  series=params_comb$series[[i]])
 
   results <- backtest(dataList, getOrders, params, sMult)
