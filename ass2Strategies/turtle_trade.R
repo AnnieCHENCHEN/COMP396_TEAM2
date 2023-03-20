@@ -23,50 +23,75 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   pos_long <- allzero
   pos_short <- allzero
   pos_M <- allzero
+
+  N_value <- rep(0,length(params$series))
+  UnitSize <- rep(0,10)
+  
   
   if(store$iter > params$periods$En_2){
     
     storeOfEnEx <- getIndicatorsAndATR(newRowList,params$series,store,params$periods)
     
     for(i in 1:length(params$series)){
-      
       store_data <- data.frame(high=store$Hi[,i], low=store$Lo[,i], close=store$cl[,i])
-      N_value <- ATR(store_data, n=20, maType=EMA, wilder=TRUE)[,'atr']
-      UnitSize <- as.numeric(trunc((params$size * 1000000 * params$capi_Ratio* params$moneyRatio)/(N_value[store$iter] * params$multi)))
+      # N_value[i] <- tail(ATR(object,n=10,maType = "EMA")[,2], n=1)
+      N_value[i] <- tail(ATR(store_data,n=10,maType = "EMA")[,2], n=1)
+      
+      if(N_value[i] < 0.00000001) {
+        UnitSize[params$series[i]] <- 0
+      } else {
+        print(N_value[i])
+        print(N_value[i] * params$multi)
+        aa <- as.numeric(trunc((params$size * 1000000 * params$capi_Ratio* params$moneyRatio)/(N_value[i] * params$multi)))
+        UnitSize[params$series[i]] <- aa
+      }
       
       # Initiate SHORT position
       if(as.numeric(store$Hi[store$iter,i]) > as.numeric(storeOfEnEx$Max_En2[store$iter-1,i])){
         
-        pos_short[params$series[i]] = -1 * UnitSize
+        pos_short[params$series[i]] <- -1 * UnitSize[i]
         
-        N_short = as.numeric(N_value[store$iter])
+        N_short = as.numeric(N_value[i])
         TxnPrice_S = as.numeric(store$cl[store$iter,i])
         StopPrice_S = TxnPrice_S - params$Multi_N * N_short #退出/止损价格
         StopPrice_S2 = TxnPrice_S - (params$Multi_N-3) * N_short #平部分仓的价格
         
         # Add to SHORT position   
-        if(store$Hi[store$iter,i] > ( TxnPrice_S + N_short * (params$Multi_N-2) )) {
+        a=as.numeric(store$Hi[store$iter,i])
+        b=as.numeric( TxnPrice_S + N_short * (params$Multi_N-2) )
+        # if(as.numeric(store$Hi[store$iter,i]) > as.numeric( TxnPrice_S + N_short * (params$Multi_N-2) )) {
+        if(length(b)==0 || a>b) {
           
-          pos_short[params$series[i]] = -2 * UnitSize #加仓
+          pos_short[params$series[i]] <- -2 * UnitSize[params$series[i]] #加仓
         }
       }else{
         # Initiate LONG position
+        # print(as.numeric(store$Lo[store$iter,i]) < as.numeric(storeOfEnEx$Min_En2[store$iter-1,i]))
+
         if(as.numeric(store$Lo[store$iter,i]) < as.numeric(storeOfEnEx$Min_En2[store$iter-1,i])){
           
-          pos_long[params$series[i]] = 1 * UnitSize
+          pos_long[params$series[i]] <- 1 * UnitSize[params$series[i]]
           
-          N_long = as.numeric(N_value[store$iter])
+          N_long = as.numeric(N_value[i])
           TxnPrice_L = as.numeric(store$cl[store$iter,i])
           StopPrice_L = TxnPrice_L + params$Multi_N*N_long #退出/止损价格
           StopPrice_L2 = TxnPrice_L + (params$Multi_N-3)*N_long #平部分仓的价格
           
           # Add to LONG position
-          if(store$Lo[store$iter,i] < ( TxnPrice_L - N_long*(params$Multi_N-2) )) {
+          a=as.numeric(store$Lo[store$iter,i])
+          b=as.numeric(TxnPrice_L - N_long*(params$Multi_N-2) )
+
+          if(length(b)!=0 && a<b) {
+
+            print(as.numeric(store$Lo[store$iter,i]) < as.numeric(TxnPrice_L - N_long*(params$Multi_N-2) ))
             
-            pos_long[params$series[i]] = 2 * UnitSize#加仓
+            pos_long[params$series[i]] <- 2 * UnitSize[params$series[i]]#加仓
           }
         }
-      }
+        }
+        print(UnitSize)
+        print("******************")
+        
       # Position exits and stops 退出和止损条件  pos != 0 
       #平部分仓
       if(( pos_short[params$series[i]] < 0 && (as.numeric(store$Lo[store$iter,i]) < as.numeric(storeOfEnEx$Min_En1[store$iter-1,i]) || as.numeric(store$Lo[store$iter,i]) < StopPrice_S2) ) ||
@@ -81,12 +106,13 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         #全部退出
         if((pos_short[params$series[i]] < 0 && store$Lo[store$iter,i] < StopPrice_S) || (pos_long[params$series[i]] > 0 && store$Hi[store$iter,i] > StopPrice_L)){
           
-          pos_M[params$series[i]] = -currentPos[i]
+          pos_M[params$series[i]] <- -currentPos[i]
         }
         
       }
       
     }# for循环终点
+    
     
   }
   
@@ -163,6 +189,6 @@ updateStore <- function(store, newRowList, series, params) {
   store$Hi <- updateHiStore(store$Hi,newRowList,series,store$iter)
   store$Lo <- updateLoStore(store$Lo,newRowList,series,store$iter)
   store$cl <- updateClStore(store$cl,newRowList,series,store$iter)
-
+  
   return(store)
 }
