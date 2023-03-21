@@ -37,7 +37,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       
       #Calculate ATR indicator. Use it in the stop loss
       object <- data.frame(High = store$h[1:store$iter,i],Low=store$l[1:store$iter,i],Close = store$cl[1:store$iter,i])
-      atr[i] <- tail(ATR(object,n=10,maType = "EMA")[,2], n=1)
+      atr[i] <- tail(ATR(object,n=20,maType = "EMA")[,2], n=1)
       
       #risk management part 
       # set stop loss price for long and short
@@ -54,7 +54,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       if(units[params$series[i]]<=0 || units[params$series[i]]>store$v[store$iter,i]){
         new_units[params$series[i]]<- params$initUnit
       }else{
-        new_units[params$series[i]]<- units[params$series[i]]
+        new_units[params$series[i]]<- trunc(units[params$series[i]]/2)
       }
       
       
