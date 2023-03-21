@@ -1,0 +1,327 @@
+Read 10 series from DATA/PART1 
+[1] 81
+Just completed 1 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        2.00        3.00        0.92 
+Just completed 2 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        2.00        4.00        0.82 
+Just completed 3 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+       10.0        22.0        55.0         1.0         2.0         5.0         1.3 
+Just completed 4 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        2.00        6.00        0.38 
+Just completed 5 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        2.00        8.00        0.91 
+Just completed 6 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+       10.0        22.0        55.0         1.0         2.0         9.0         0.8 
+Just completed 7 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        2.00       10.00        0.96 
+Just completed 8 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        3.00        4.00        0.71 
+Just completed 9 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        3.00        5.00        2.17 
+Just completed 10 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        3.00        6.00        0.41 
+Just completed 11 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        3.00        8.00        1.36 
+Just completed 12 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        3.00        9.00        1.13 
+Just completed 13 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        3.00       10.00        1.41 
+Just completed 14 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        4.00        5.00        2.01 
+Just completed 15 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        4.00        6.00        0.27 
+Just completed 16 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+       10.0        22.0        55.0         1.0         4.0         8.0         1.3 
+Just completed 17 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        4.00        9.00        1.04 
+Just completed 18 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        4.00       10.00        1.49 
+Just completed 19 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        5.00        6.00        1.08 
+Just completed 20 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        5.00        8.00        3.87 
+Just completed 21 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        5.00        9.00        6.82 
+Just completed 22 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        5.00       10.00        6.83 
+Just completed 23 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        6.00        8.00        0.39 
+Just completed 24 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        6.00        9.00        0.24 
+Just completed 25 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        1.00        6.00       10.00        0.89 
+Just completed 26 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        3.00        4.00        0.85 
+Just completed 27 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        3.00        5.00        1.34 
+Just completed 28 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        3.00        6.00        0.41 
+Just completed 29 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        3.00        8.00        0.94 
+Just completed 30 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        3.00        9.00        0.83 
+Just completed 31 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        3.00       10.00        0.98 
+Just completed 32 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        4.00        5.00        1.23 
+Just completed 33 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        4.00        6.00        0.33 
+Just completed 34 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        4.00        8.00        0.84 
+Just completed 35 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        4.00        9.00        0.72 
+Just completed 36 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        4.00       10.00        0.89 
+Just completed 37 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        5.00        6.00        0.66 
+Just completed 38 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        5.00        8.00        1.32 
+Just completed 39 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        5.00        9.00        1.23 
+Just completed 40 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        5.00       10.00        1.34 
+Just completed 41 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        6.00        8.00        0.39 
+Just completed 42 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        6.00        9.00        0.29 
+Just completed 43 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        6.00       10.00        0.46 
+Just completed 44 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        8.00        9.00        0.82 
+Just completed 45 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        8.00       10.00        0.99 
+Just completed 46 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        2.00        9.00       10.00        0.88 
+Just completed 47 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        3.00        4.00        5.00        1.09 
+Just completed 48 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        3.00        4.00        6.00        0.18 
+Just completed 49 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        3.00        4.00        8.00        0.67 
+Just completed 50 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        3.00        4.00        9.00        0.55 
+Just completed 51 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        3.00        4.00       10.00        0.76 
+Just completed 52 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        3.00        5.00        6.00        1.01 
+Just completed 53 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        3.00        5.00        8.00        2.07 
+Just completed 54 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        3.00        5.00        9.00        1.85 
+Just completed 55 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        3.00        5.00       10.00        2.04 
+Just completed 56 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        3.00        6.00        8.00        0.38 
+Just completed 57 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+       10.0        22.0        55.0         3.0         6.0         9.0         0.2 
+Just completed 58 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        3.00        6.00       10.00        0.52 
+Just completed 59 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        3.00        8.00        9.00        1.07 
+Just completed 60 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        3.00        8.00       10.00        1.35 
+Just completed 61 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        3.00        9.00       10.00        1.15 
+Just completed 62 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        4.00        5.00        6.00        0.85 
+Just completed 63 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        4.00        5.00        8.00        1.88 
+Just completed 64 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        4.00        5.00        9.00        1.65 
+Just completed 65 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        4.00        5.00       10.00        2.02 
+Just completed 66 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        4.00        6.00        8.00        0.22 
+Just completed 67 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        4.00        6.00        9.00        0.03 
+Just completed 68 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        4.00        6.00       10.00        0.42 
+Just completed 69 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        4.00        8.00        9.00        0.94 
+Just completed 70 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        4.00        8.00       10.00        1.38 
+Just completed 71 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        4.00        9.00       10.00        1.15 
+Just completed 72 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        5.00        6.00        8.00        1.09 
+Just completed 73 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        5.00        6.00        9.00        0.89 
+Just completed 74 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        5.00        6.00       10.00        1.34 
+Just completed 75 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+       10.0        22.0        55.0         5.0         8.0         9.0         3.2 
+Just completed 76 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        5.00        8.00       10.00        4.44 
+Just completed 77 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+       10.0        22.0        55.0         5.0         9.0        10.0         6.6 
+Just completed 78 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        6.00        8.00        9.00        0.14 
+Just completed 79 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        6.00        8.00       10.00        0.56 
+Just completed 80 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        6.00        9.00       10.00        0.49 
+Just completed 81 out of 81 
+       Ex_1        En_1        En_2 series_use1 series_use2 series_use3    PD Ratio 
+      10.00       22.00       55.00        8.00        9.00       10.00        1.82 
+      Ex_1 En_1 En_2 series_use1 series_use2 series_use3 PD Ratio
+ [1,]   10   22   55           1           5          10     6.83
+ [2,]   10   22   55           1           5           9     6.82
+ [3,]   10   22   55           5           9          10     6.60
+ [4,]   10   22   55           5           8          10     4.44
+ [5,]   10   22   55           1           5           8     3.87
+ [6,]   10   22   55           5           8           9     3.20
+ [7,]   10   22   55           1           3           5     2.17
+ [8,]   10   22   55           3           5           8     2.07
+ [9,]   10   22   55           3           5          10     2.04
+[10,]   10   22   55           4           5          10     2.02
+[11,]   10   22   55           1           4           5     2.01
+[12,]   10   22   55           4           5           8     1.88
+[13,]   10   22   55           3           5           9     1.85
+[14,]   10   22   55           8           9          10     1.82
+[15,]   10   22   55           4           5           9     1.65
+[16,]   10   22   55           1           4          10     1.49
+[17,]   10   22   55           1           3          10     1.41
+[18,]   10   22   55           4           8          10     1.38
+[19,]   10   22   55           1           3           8     1.36
+[20,]   10   22   55           3           8          10     1.35
+[21,]   10   22   55           2           3           5     1.34
+[22,]   10   22   55           2           5          10     1.34
+[23,]   10   22   55           5           6          10     1.34
+[24,]   10   22   55           2           5           8     1.32
+[25,]   10   22   55           1           2           5     1.30
+[26,]   10   22   55           1           4           8     1.30
+[27,]   10   22   55           2           4           5     1.23
+[28,]   10   22   55           2           5           9     1.23
+[29,]   10   22   55           3           9          10     1.15
+[30,]   10   22   55           4           9          10     1.15
+[31,]   10   22   55           1           3           9     1.13
+[32,]   10   22   55           3           4           5     1.09
+[33,]   10   22   55           5           6           8     1.09
+[34,]   10   22   55           1           5           6     1.08
+[35,]   10   22   55           3           8           9     1.07
+[36,]   10   22   55           1           4           9     1.04
+[37,]   10   22   55           3           5           6     1.01
+[38,]   10   22   55           2           8          10     0.99
+[39,]   10   22   55           2           3          10     0.98
+[40,]   10   22   55           1           2          10     0.96
+[41,]   10   22   55           2           3           8     0.94
+[42,]   10   22   55           4           8           9     0.94
+[43,]   10   22   55           1           2           3     0.92
+[44,]   10   22   55           1           2           8     0.91
+[45,]   10   22   55           1           6          10     0.89
+[46,]   10   22   55           2           4          10     0.89
+[47,]   10   22   55           5           6           9     0.89
+[48,]   10   22   55           2           9          10     0.88
+[49,]   10   22   55           2           3           4     0.85
+[50,]   10   22   55           4           5           6     0.85
+[51,]   10   22   55           2           4           8     0.84
+[52,]   10   22   55           2           3           9     0.83
+[53,]   10   22   55           1           2           4     0.82
+[54,]   10   22   55           2           8           9     0.82
+[55,]   10   22   55           1           2           9     0.80
+[56,]   10   22   55           3           4          10     0.76
+[57,]   10   22   55           2           4           9     0.72
+[58,]   10   22   55           1           3           4     0.71
+[59,]   10   22   55           3           4           8     0.67
+[60,]   10   22   55           2           5           6     0.66
+[61,]   10   22   55           6           8          10     0.56
+[62,]   10   22   55           3           4           9     0.55
+[63,]   10   22   55           3           6          10     0.52
+[64,]   10   22   55           6           9          10     0.49
+[65,]   10   22   55           2           6          10     0.46
+[66,]   10   22   55           4           6          10     0.42
+[67,]   10   22   55           1           3           6     0.41
+[68,]   10   22   55           2           3           6     0.41
+[69,]   10   22   55           1           6           8     0.39
+[70,]   10   22   55           2           6           8     0.39
+[71,]   10   22   55           1           2           6     0.38
+[72,]   10   22   55           3           6           8     0.38
+[73,]   10   22   55           2           4           6     0.33
+[74,]   10   22   55           2           6           9     0.29
+[75,]   10   22   55           1           4           6     0.27
+[76,]   10   22   55           1           6           9     0.24
+[77,]   10   22   55           4           6           8     0.22
+[78,]   10   22   55           3           6           9     0.20
+[79,]   10   22   55           3           4           6     0.18
+[80,]   10   22   55           6           8           9     0.14
+[81,]   10   22   55           4           6           9     0.03
