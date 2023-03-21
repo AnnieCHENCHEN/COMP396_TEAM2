@@ -18,18 +18,18 @@ sMult <- 0.2 # slippage multiplier
 
 # in-sample parameters
 periods_short <- seq(from=5,to=15,by=5)
-periods_med <- seq(from=20,to=60,by=10)
-periods_long <- seq(from=80,to=110,by=10)
-Multi_N <- seq(from=5, to=10, by=3) 
-multi <- c(3,4,5)
-capi_Ratio <- c(0.3,0.4,0.5)
+periods_med <- seq(from=20,to=60,by=20)
+periods_long <- seq(from=80,to=120,by=20)
+Multi_N <- seq(from=5, to=10, by=2) 
+multi <- seq(form=3,to=7,by=2)
+capi_Ratio <- c(0.3,0.4,0.5,0.6,0.7)
 spreadPercentage=0.001
-moneyRatio <-c(0.02,0.03,0.04,0.05)
+moneyRatio <-c(0.01,0.015,0.02,0.025,0.03)
 series_use <- c(3,6,8)
 
 params_comb <- expand.grid(ex_1=periods_short, en_1=periods_med,
                            en_2=periods_long,mul=Multi_N, Ratio=moneyRatio,
-                           mutiple=multi,money=capi_Ratio,series=series_use)
+                           mutiple=multi,money=capi_Ratio,series=c(3,6,8))
 
 resultsMatrix <- matrix(nrow=nrow(params_comb), ncol=8)
 colnames(resultsMatrix) <- c("Ex_1","En_1","En_2","mult_N","moneyRatio",
@@ -49,7 +49,7 @@ for (i in 1:nrow(params_comb)) {
                  multi=params_comb$mutiple[[i]],
                  spreadPercentage=0.001,
                  capi_Ratio=params_comb$money[[i]],
-                 series=params_comb$series[[i]])
+                 series=c(3,6,8))
   
   results <- backtest(dataList, getOrders, params, sMult)
   pfolioPnL <- plotResults(dataList,results)
