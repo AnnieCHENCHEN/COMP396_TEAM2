@@ -18,18 +18,18 @@ dataList <- lapply(dataList, function(x) x[1:numOfDays])
 #test
 #StartDay <- training_days + 1
 #EndDay <- 1100
-#dataList <- getData(directory="PART1")
+#dataList <- getData(directory="PART2")
 #dataList <- lapply(dataList, function(x) x[StartDay:EndDay])
 ######################################################################
 sMult <- 0.2 # slippage multiplier
 # in-sample parameters
-lookbackSeq <- seq(from=50,to=80,by=10)
-multiple <- seq(from=2, to=4, by=1)
-riskRatio <- c(0.01,0.02)
-initUnit <- as.integer(c(5,15,35))
+lookbackSeq <- seq(from=50,to=100,by=10)
+multiple <- 3
+riskRatio <- 0.01
+initUnit <- seq(from=10, to=500, by=30)
 spreadPercentage=0.001
 moneyRatio <-0.3
-series_com <- c(2,4,7,9) #randomly pick 4 series as a group to optimize
+series_com <- c(2,4,9) #randomly pick 4 series as a group to optimize
 
 #out-sample parameters
 #lookbackSeq
