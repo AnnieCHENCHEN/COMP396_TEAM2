@@ -1,9 +1,9 @@
 source('framework/data.R'); 
 source('framework/backtester.R')
 source('framework/processResults.R'); 
-source('strategies/MACD.R') 
+source('ass2Strategies/MACD.R') 
 
-sink("optim/opti_MACD1.txt")
+sink("ass2_op/opti_MACD_data2.txt")
 
 #training days = 500  validation days = 250  testing days = 250
 #split data into 3 parts
@@ -29,7 +29,7 @@ riskRatio <- 0.01
 initUnit <- seq(from=50, to=500, by=25)
 spreadPercentage=0.001
 moneyRatio <-0.3
-series_com <- c(2,4,9) #randomly pick 4 series as a group to optimize
+series_com <- c(2,4,6,8) #randomly pick 4 series as a group to optimize
 
 #out-sample parameters
 #lookbackSeq
@@ -40,29 +40,23 @@ series_com <- c(2,4,9) #randomly pick 4 series as a group to optimize
 
 
 params_comb <- expand.grid(lookback=lookbackSeq,mul=multiple, Ratio=riskRatio,unit=initUnit,
-                           spread=spreadPercentage,money=moneyRatio)
+                           spread=spreadPercentage,money=moneyRatio,series=c(2,4,6,8))
 
-# Create a data frame for the series combinations
-series_df <- as.data.frame(series_com)
-colnames(series_df) <- paste0("series_", 1:4)
 
-# Combine the parameter grid with the series combinations
-params_comb <- merge(params_comb, series_df, all=TRUE)
-
-resultsMatrix <- matrix(nrow=nrow(params_comb),ncol=10)
-colnames(resultsMatrix) <- c("lookback","multiple","riskRatio","initUnit","moneyRatio","series_use1","series_use2","series_use3","series_use4","PD Ratio")
+resultsMatrix <- matrix(nrow=nrow(params_comb),ncol=6)
+colnames(resultsMatrix) <- c("lookback","multiple","riskRatio","initUnit","moneyRatio","PD Ratio")
 pfolioPnLList <- vector(mode="list",length=nrow(params_comb)) 
 print(nrow(params_comb))
 
 for (i in 1:nrow(params_comb)) {
   params <- list(lookback=params_comb$lookback[[i]],multiple=params_comb$mul[[i]],spreadPercentage=params_comb$spread[[i]],
-                 moneyRatio=params_comb$money[[i]],riskRatio=params_comb$Ratio[[i]],initUnit=params_comb$unit[[i]],series=as.numeric(params_comb[, paste0("series_", 1:4)][i, ])) 
+                 moneyRatio=params_comb$money[[i]],riskRatio=params_comb$Ratio[[i]],initUnit=params_comb$unit[[i]],series=c(2,4,6,8)) 
   results <- backtest(dataList, getOrders, params, sMult)
   pfolioPnL <- plotResults(dataList,results)
   
   # Do backtest
   resultsMatrix[i,] <- c(params_comb$lookback[[i]],params_comb$mul[[i]],params_comb$Ratio[[i]],
-                         params_comb$unit[[i]],params_comb$money[[i]],as.numeric(params_comb[, paste0("series_", 1:4)][i, ]),pfolioPnL$fitAgg)
+                         params_comb$unit[[i]],params_comb$money[[i]],pfolioPnL$fitAgg)
   
   pfolioPnLList[[i]]<- pfolioPnL
   cat("Just completed",i,"out of",nrow(params_comb),"\n")
