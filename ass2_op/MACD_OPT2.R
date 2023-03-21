@@ -26,7 +26,7 @@ sMult <- 0.2 # slippage multiplier
 lookbackSeq <- seq(from=50,to=100,by=10)
 multiple <- 3
 riskRatio <- 0.01
-initUnit <- seq(from=10, to=500, by=30)
+initUnit <- seq(from=50, to=500, by=25)
 spreadPercentage=0.001
 moneyRatio <-0.3
 series_com <- c(2,4,9) #randomly pick 4 series as a group to optimize
