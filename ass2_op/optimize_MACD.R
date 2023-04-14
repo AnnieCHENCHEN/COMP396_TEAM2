@@ -5,7 +5,7 @@ source('strategies/MACD.R')
 
 sink("optimise_data/INSAMPLE_MACD_data1.txt")
 
-#training days = 500  validation days = 250  testing days = 250
+#training days = 550  testing days = 250
 #split data into 3 parts
 training_days <- 550  
 testing_days <- 250
