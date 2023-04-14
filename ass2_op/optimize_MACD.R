@@ -5,8 +5,7 @@ source('strategies/MACD.R')
 
 sink("optim/opti_MACD1.txt")
 
-#training days = 500  validation days = 250  testing days = 250
-#split data into 3 parts
+#training days = 500  testing days =550
 training_days <- 550  
 testing_days <- 250
 ##########################################################################
@@ -29,16 +28,10 @@ riskRatio <- c(0.01,0.02)
 initUnit <- as.integer(c(5,15,35))
 spreadPercentage=0.001
 moneyRatio <-0.3
-series_com <- t(combn(1:10,4)) #randomly pick 4 series as a group to optimize
-
-#out-sample parameters
-#lookbackSeq
-#multiple
-#riskRatio
-#initUnit
-#series_combation
+series_com <- t(combn(1:10,3)) #randomly pick 3 series as a group to optimize
 
 
+# Combine all parameters together, easily to use gird() to optimize
 params_comb <- expand.grid(lookback=lookbackSeq,mul=multiple, Ratio=riskRatio,unit=initUnit,
                            spread=spreadPercentage,money=moneyRatio)
 
