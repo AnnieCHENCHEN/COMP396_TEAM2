@@ -2,15 +2,14 @@
 # combination of 3 strategies(turtle trade, MACD, TMA)
 #
 # 
-# "TEAM2" = list(periods=list(Ex_1=10,En_1=20, En_2=55),size=0.01,unitRatio=0.02,
-#                      capi_Ratio=0.3,multi=4,Multi_N=5,
-#                      LOOKBACK=90,multiple=3,moneyRatio=0.3,riskRatio=0.02,initUnit=5,
-#                      lookbacks=list(short=10,medium=85,long=95),stopRatio=0.9,
-#                      riskPortion=0.003,riskPerShare=3,series=1:10,moneyRate=0.4,spreadPercentage=0.001)
-#
+# "TEAM2" = list(periods=list(Ex_1=10,En_1=20, En_2=110),size=0.01,unitRatio=0.02,
+#                capi_Ratio=0.2,multi=7,Multi_N=7,
+#                LOOKBACK=50,multiple=4,moneyRatio=0.3,riskRatio=0.03,initUnit=20,
+#                lookbacks=list(short=30,medium=50,long=100),stopRatio=0.5,
+#                riskPortion=0.001,riskPerShare=3,series=1:10,moneyRate=0.4,spreadPercentage=0.001)
 require(TTR)
 require(ggplot2)
-maxRows <- 3100 # depends on the row number of series
+maxRows <- 3100
 
 getOrders <- function(store, newRowList, currentPos, info, params) {
   
@@ -34,7 +33,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   #### TMA variables
   posSizes <- allzero
   
-  if(store$iter > params$lookbacks$long){
+  if(store$iter > params$periods$En_2){
     
     ######## Turtle Trade 3 lines ########
     storeOfEnEx <- getIndicatorsAndATR(newRowList,params$series,store,params$periods)
@@ -46,7 +45,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       N_value <- ATR(store_data, n=20, maType=EMA, wilder=TRUE)[,'atr']
 
       #-------------------------Turtle Trade Strategy----------------------#
-      if(i == 3 || i == 9 || i==10){
+      if(i == 2 || i == 4 || i == 8 ){
 
         UnitSize <- as.numeric(trunc((params$size * 1000000 * params$capi_Ratio* params$unitRatio)/(N_value[store$iter] * params$multi)))
         # Initiate SHORT position
@@ -98,7 +97,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       }
 
       #-------------------------MACD Strategy----------------------#
-      if(i == 2 || i == 4 || i == 6 || i == 8){
+      if(i == 3 || i == 9){
         #Calculate MACD indicators
         macd_data <- MACD(store$cl[1:store$iter,i],nFast = 12, nSlow = 26, nSig =9, percent = TRUE)
         DIFF <- macd_data[,1]
@@ -113,12 +112,12 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
         account_risk = params$riskRatio*params$moneyRatio*10000000
 
         # Calculate position size based on account risk
-        units[params$series[i]] <- round(account_risk / (params$multiple*N_value[store$iter]))
+        units[params$series[i]] <- round(account_risk / params$multiple*N_value[store$iter])
 
         if(units[params$series[i]]<=0 || units[params$series[i]]>store$Vol[store$iter,i]){
-          units[params$series[i]]<- 50
+          units[params$series[i]]<- params$initUnit
         }else{
-          units[params$series[i]]<-units[params$series[i]]
+          units[params$series[i]]<- trunc(units[params$series[i]] / 2)
         }
 
         #Compare MACD line and signal line, get the position signal
@@ -140,7 +139,7 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
 
         }
       }
-      if(i == 1 || i == 5 || i == 7){
+      if(i == 1 || i == 5 || i == 10){
         #-------------------------TMA Strategy----------------------#
         # get positioin sizing. We calculate the position size with the close price
         #get a list:each column stores returns for each series and calculate the mean value for each series
@@ -216,20 +215,6 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
               limitOrders2=limitOrders2,limitPrices2=limitPrices2))
   
 }
-
-################# get TMA ratio ###########################
-# getTMAIndicators <- function(loockbacks,prices){
-#   
-#   TMA_list = list(short = 0, medium = 0, long = 0)
-#   
-#   for (i in 1 : length(params$lookbacks)){
-#     #calculate SMA for each lookbacks
-#     sma <- SMA(prices, n = params$lookbacks[[i]])
-#     TMA_list[i] = as.numeric(sma[length(sma)])
-#   }
-#   return(TMA_list)
-# }
-
 
 ############ calculate indicators for turtle trade #################
 getIndicatorsAndATR <- function(newRowList,series,store,periods){
