@@ -36,20 +36,15 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       DEA <- macd_data[,2]
       
       #Calculate ATR indicator. Use it in the stop loss
-      object <- data.frame(High = store$h[1:store$iter,i],Low=store$l[1:store$iter,i],Close = store$cl[1:store$iter,i])
-      atr[i] <- tail(ATR(object,n=20,maType = "EMA")[,2], n=1)
-      
-      #risk management part 
-      # set stop loss price for long and short
-      Bstop_price[params$series[i]] <- store$cl[store$iter,i]-params$multiple*atr[i]
-      Sstop_price[params$series[i]] <- store$cl[store$iter,i]+params$multiple*atr[i]
-      
+      object <- data.frame(High = store$h[1:store$iter,i],Low=store$l[1:store$iter,i]
+                           ,Close = store$cl[1:store$iter,i])
+      atr<- ATR(object, n=20, maType=EMA, wilder=TRUE)[,'atr']
       
       #account risk, got 30% of 10000000 in this strategy
       account_risk = params$riskRatio*params$moneyRatio*10000000
       
       # Calculate position size based on account risk
-      units[params$series[i]] <- round(account_risk / (params$multiple*atr[i]))
+      units[params$series[i]] <- round(account_risk / (params$multiple*as.numeric(atr[store$iter])))
       
       if(units[params$series[i]]<=0 || units[params$series[i]]>store$v[store$iter,i]){
         new_units[params$series[i]]<- params$initUnit
@@ -58,30 +53,32 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
       }
       
       
+      #risk management part 
+      # set stop loss price for long and short
+      Bstop_price[params$series[i]] <- store$cl[store$iter,i]-params$multiple*as.numeric(atr[store$iter])
+      Sstop_price[params$series[i]] <- store$cl[store$iter,i]+params$multiple*as.numeric(atr[store$iter])
+      
+      
       #Compare MACD line and signal line, get the position signal
       #Entry market conditions
       # DIFF & DEA >0 & DIFF>DEA & DIFF (yesterday) is smaller than DEA (yesterday)
       if (DIFF[store$iter]>0 && DEA[store$iter]>0 && DIFF[store$iter]>DEA[store$iter]
           && DIFF[store$iter-1]<DEA[store$iter-1]) {
         
-        #sell,signal= -1, position sizes= -1*units
-        pos1[params$series[i]] <- -1*new_units[params$series[i]]
-        
-        
+        pos1[params$series[i]] <- 1*units[params$series[i]]  #buy,+1
       }
       else if (DIFF[store$iter]<0 && DEA[store$iter]<0 && DIFF[store$iter]<DEA[store$iter]
                && DIFF[store$iter-1]>DEA[store$iter-1] && currentPos[i] !=0) {
-              #DIFF & DEA <0 & DIFF<DEA & DIFF (yesterday) is bigger than DEA (yesterday) & currentPos has units
         
-        #buy, signal= +1, position sizes= 1*units
-        pos2[params$series[i]] <- 1*new_units[params$series[i]]
-        
+        #DIFF & DEA <0 & DIFF<DEA & DIFF (yesterday) is bigger than DEA (yesterday) & currentPos has units
+        pos2[params$series[i]] <- -1*units[params$series[i]] #sell, -1
       }
-      
-      
+              
+
       else if (store$cl[store$iter-1,i]>Bstop_price[i] && store$cl[store$iter,i]<=Bstop_price[i]
                ||store$cl[store$iter-1,i]<Sstop_price[params$series[i]] && store$cl[store$iter,i]>=Sstop_price[params$series[i]] 
-               && currentPos[i]>=0){ #Exit market. When close price <= buy stop price or close price >= sell stop price, we trade our currentPos using market order
+               && currentPos[i]>=0){ #Exit market. When close price <= buy stop price or close price >= sell stop price
+                                     #we trade our currentPos using market order
         pos3[params$series[i]] <- -currentPos[params$series[i]]
         
       }
@@ -93,11 +90,11 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
   spread <- sapply(1:length(newRowList),function(i)
     params$spreadPercentage * (newRowList[[i]]$High -newRowList[[i]]$Low))
   
-  limitOrders1  <- pos2 # BUY LIMIT ORDERS
+  limitOrders1  <- pos1 # BUY LIMIT ORDERS
   limitPrices1  <- sapply(1:length(newRowList),function(i) 
     newRowList[[i]]$Close - spread[i]/2)
   
-  limitOrders2  <- pos1# SELL LIMIT ORDERS
+  limitOrders2  <- pos2# SELL LIMIT ORDERS
   limitPrices2  <- sapply(1:length(newRowList),function(i) 
     newRowList[[i]]$Close + spread[i]/2)
   
