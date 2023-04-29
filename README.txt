@@ -1,18 +1,18 @@
-# COMP396 --- TEAM2
-# We have four strategies of TMA-Momentum strategy, MACD-Momentum strategy, Turtle trading strategy and Combination strategy.
-# In "ass2Strategis" document, we stored: MACD.R, Momentum-TMA.R, turtle_trade.R and TEAM2.R.
+COMP396 --- TEAM2
+We have four strategies of TMA-Momentum strategy, MACD-Momentum strategy, Turtle trading strategy and Combination strategy.
+In "ass2Strategis" document, we stored: MACD.R, Momentum-TMA.R, turtle_trade.R and TEAM2.R.
 
 # How to run three strategies and the combination strategy:
-# In "main.R", change the name of the strategy (MACD, Momentum-TMA, turtle_trade, TEAM2) and run it, it will show the graph of PD ratio of each series.
-# The parameters combinations of four strategies have been wrote in the "example_strategies.R".
+In "main.R", change the name of the strategy (MACD, Momentum-TMA, turtle_trade, TEAM2) and run it, it will show the graph of PD ratio of each series.
+The parameters combinations of four strategies have been wrote in the "example_strategies.R".
 
 # Data analysis part
-# In "data_analysis" document, we stored: volatility.R, trend_movingAverage.R, volume_trading.R and totalReturn_curve.R.
-# Run "volatility.R" can get the graph of 30-historical volatility changing of each series. We can see and make the data analysis through graphs of 10 series.
-# Run "trend_movingAverage.R" can get the graph of 10-day moving average line, 30-day moving average line, 100-day moving average line and 200-day moving average line. We can see and make the data analysis through graphs of 10 series.
-# Run "volume_trading.R" can get the graph of daily volume, 30-day moving average of the volume and 100-day moving average of the volume. We can see and make the data analysis through graphs of 10 series.
-# In order to obtain the total return curve of "TEAM2.R" (combination strategy), we have wrote "main_compare.R" to get the graph of total return curve. Run "main_compare.R" (in the "main_compare.R", we have sourced the "data_analysis/totalReturn_curve.R") and change the data source (PART1, PART2, PART3), we can get the total return curve of the combination strategy based on the difference dataset which can help us to compare the difference of the total return changing between three dataset.
+In "data_analysis" document, we stored: volatility.R, trend_movingAverage.R, volume_trading.R and totalReturn_curve.R.
+1. Run "volatility.R" can get the graph of 30-historical volatility changing of each series. We can see and make the data analysis through graphs of 10 series.
+2. Run "trend_movingAverage.R" can get the graph of 10-day moving average line, 30-day moving average line, 100-day moving average line and 200-day moving average line. We can see and make the data analysis through graphs of 10 series.
+3. Run "volume_trading.R" can get the graph of daily volume, 30-day moving average of the volume and 100-day moving average of the volume. We can see and make the data analysis through graphs of 10 series.
+4. In order to obtain the total return curve of "TEAM2.R" (combination strategy), we have wrote "main_compare.R" to get the graph of total return curve. Run "main_compare.R" (in the "main_compare.R", we have sourced the "data_analysis/totalReturn_curve.R") and change the data source (PART1, PART2, PART3), we can get the total return curve of the combination strategy based on the difference dataset which can help us to compare the difference of the total return changing between three dataset.
 
 # Optimization part
-# In "optim" document, we have 6 files which named "MACD_optimization.R", "MACD_optimization2.R"
-# For MACD-Momentum strategy, the 
+In "optim" document, we have 6 files which named "MACD_optimization.R", "MACD_optimization2.R"
+1. For MACD-Momentum strategy, the 
