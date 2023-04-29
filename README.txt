@@ -21,3 +21,6 @@ In "optim" folder, we have 6 files which named "optimise_MACD.R", "optimise_MACD
 
 # Source code
 Our three strategies all three of our strategies refer to three codes that have all been uploaded to the “source_code" folder: "source_code_MACD.R", "source_code_turtle.R" and "source_code_TMA.R".
+
+# Framework
+The "backtester.R", "data.R", "processResults.R" and "utilities.R" stored in the "framework" folder. We used "backtester.R" to backtest our strategies check their stability and reliability. And "processResults.R" and "utilities.R" shown the performaces of our strategies using graphs. We sourced "data.R" in the "main.R" to read the data files (we have three data files: part 1 data, part 2, data and part 3 data).
