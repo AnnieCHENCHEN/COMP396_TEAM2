@@ -29,18 +29,10 @@ riskRatio <- 0.01
 initUnit <- seq(from=50, to=500, by=25)
 spreadPercentage=0.001
 moneyRatio <-0.3
-series_com <- c(2,4,6,8) #randomly pick 4 series as a group to optimize
-
-#out-sample parameters
-#lookbackSeq
-#multiple
-#riskRatio
-#initUnit
-#series_combation
-
+series_com <- c(3，9) #choose serie 3 and 9 in MACD strategy
 
 params_comb <- expand.grid(lookback=lookbackSeq,mul=multiple, Ratio=riskRatio,unit=initUnit,
-                           spread=spreadPercentage,money=moneyRatio,series=c(2,4,6,8))
+                           spread=spreadPercentage,money=moneyRatio)
 
 
 resultsMatrix <- matrix(nrow=nrow(params_comb),ncol=6)
@@ -50,7 +42,7 @@ print(nrow(params_comb))
 
 for (i in 1:nrow(params_comb)) {
   params <- list(lookback=params_comb$lookback[[i]],multiple=params_comb$mul[[i]],spreadPercentage=params_comb$spread[[i]],
-                 moneyRatio=params_comb$money[[i]],riskRatio=params_comb$Ratio[[i]],initUnit=params_comb$unit[[i]],series=c(2,4,6,8)) 
+                 moneyRatio=params_comb$money[[i]],riskRatio=params_comb$Ratio[[i]],initUnit=params_comb$unit[[i]],series=c(3,9)) 
   results <- backtest(dataList, getOrders, params, sMult)
   pfolioPnL <- plotResults(dataList,results)
   
