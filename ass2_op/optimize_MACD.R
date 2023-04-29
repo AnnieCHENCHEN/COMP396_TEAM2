@@ -29,7 +29,7 @@ riskRatio <- 0.02
 initUnit <- seq(from=20, to=200, by=60)
 spreadPercentage=0.001
 moneyRatio <-0.3
-series_com <- t(combn(1:10,3)) #randomly pick 3 series as a group to optimize
+series_com <- t(combn(1:10,4)) #randomly pick 4 series as a group to optimize
 
 #out-sample parameters
 #lookbackSeq
