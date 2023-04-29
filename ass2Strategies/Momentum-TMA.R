@@ -1,54 +1,52 @@
 # Momentum strategy (with TMA with stop loss)
-# This strategy uses only marker order
+# This strategy uses marker order and limit order
 
-#"Momentum2" =list(lookbacks=list(short=as.integer(15),medium=as.integer(40),long=as.integer(90))
-#                  ,series=1:10,stopRatio=0.3,riskPortion=0.001,riskPerShare=4,spreadPercentage=0.001)
+#"Momentum2" =list(lookbacks=list(short=as.integer(30),medium=as.integer(50),long=as.integer(100)),moneyRate=0.4
+#                  ,series=c(1,5,10),stopRatio=0.5,riskPortion=0.001,riskPerShare=3,spreadPercentage=0.001)
 
 maxRows <-3100
 
 getOrders <- function(store, newRowList, currentPos, info, params) {
   # used for initializing vectors
-  allzero  <- rep(0,length(newRowList))
+  allzero  <- rep(0,length(newRowList)) 
   buyPos <- allzero
   sellPos <- allzero
   posSizes <- allzero
   marketPos <- allzero
- 
- 
+  
+  
   if (is.null(store))
     store <- initStore(newRowList)  
   else
     store <- updateStore(store, newRowList)  
+  
+  # get positioin sizing. We calculate the position size with the close price
+  #get a list:each column stores returns for each series and calculate the mean value for each series
+  CloseDiffs <- diff(store$cl)
+  absCloseDiffs    <- matrix(abs(CloseDiffs),ncol = length(params$series),byrow=TRUE)
+  
+  # Calculate the column means for non-zero elements and find the largest mean value
+  avgAbsDiffs <- apply(absCloseDiffs, 2, function(x) mean(x[x > 0]))
  
+  #calculate position size
+  #params$riskPortion:The maximum amount of money you are willing to lose on a single trade.
+  #params$riskPerShare:The risk per share as a multiple of the average absolute difference. 
+  #params$moneyRate:split moneyRate percentage total investment capital in this strategy
+  posSizes <- round((params$riskPortion*params$moneyRate*1000000)/(params$riskPerShare*avgAbsDiffs))
 
   if (store$iter > params$lookbacks$long) {  
-   
+    
     for(i in 1:length(params$series)){
-     
-      # get positioin sizing. We calculate the position size with the close price
-      #get a list:each column stores returns for each series and calculate the mean value for each series
-      CloseDiffs <- diff(store$cl)
-      absCloseDiffs    <- matrix(abs(CloseDiffs),ncol = length(params$series),byrow=TRUE)
-
-      # Calculate the column means for non-zero elements and find the largest mean value
-        avgAbsDiffs <- apply(absCloseDiffs, 2, function(x) mean(x[x > 0]))
-
-        #calculate position size
-        #params$riskPortion:The maximum amount of money you are willing to lose on a single trade.
-        #params$riskPerShare:The risk per share as a multiple of the average absolute difference.
-        #split total investment for TMA strategy
-        #balance=info$balance*params$moneyRate
-       
-      posSizes <- round((params$riskPortion*info$balance)/(params$riskPerShare*avgAbsDiffs))
-     
+      
+      
       ##set stop loss: params$stopRatio
       stopRate <- params$stopRatio
-     
+      
       #calculate the stop loss price level for long position
       #find the max and min close price in past days(medium lookback)
       highestPrice <- tail(cummax(store$cl[(store$iter-params$lookbacks$medium):store$iter,i]),1)
       maxStopLoss_price <- (1-stopRate) * highestPrice
-     
+      
       lowestPrice <- tail(cummin(store$cl[(store$iter-params$lookbacks$medium):store$iter,i]),1)
       minStopLoss_price <- (1+stopRate) * lowestPrice
      
@@ -68,31 +66,31 @@ getOrders <- function(store, newRowList, currentPos, info, params) {
           sellPos[params$series[i]] <- -1 * posSizes[i]
         }
       }
-     
+      
 
-  #for long position and short position
+  #exit condition of long position and short position
  if ( (buyPos[params$series[i]] > 0 && store$cl[store$iter,i] <= maxStopLoss_price)
      || (sellPos[params$series[i]] < 0 && store$cl[store$iter,i] >= minStopLoss_price)){
    
     marketPos[params$series[i]] <- -currentPos[params$series[i]]
- 
+  
   }
     }
   }
   #set limit price & limit orders
- 
+
   spread <- sapply(1:length(newRowList),function(i)
     params$spreadPercentage * (newRowList[[i]]$High -newRowList[[i]]$Low))
- 
+  
   limitOrders1  <- buyPos # BUY LIMIT ORDERS
-  limitPrices1  <- sapply(1:length(newRowList),function(i)
+  limitPrices1  <- sapply(1:length(newRowList),function(i) 
     newRowList[[i]]$Close - spread[i]/2)
- 
+  
   limitOrders2  <- sellPos# SELL LIMIT ORDERS
-  limitPrices2  <- sapply(1:length(newRowList),function(i)
+  limitPrices2  <- sapply(1:length(newRowList),function(i) 
     newRowList[[i]]$Close + spread[i]/2)
- 
- 
+  
+  
   return(list(store=store,marketOrders=marketPos,
               limitOrders1=limitOrders1,limitPrices1=limitPrices1,
               limitOrders2=limitOrders2,limitPrices2=limitPrices2))
