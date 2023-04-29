@@ -14,5 +14,5 @@ In "data_analysis" document, we stored: volatility.R, trend_movingAverage.R, vol
 4. In order to obtain the total return curve of "TEAM2.R" (combination strategy), we have wrote "main_compare.R" to get the graph of total return curve. Run "main_compare.R" (in the "main_compare.R", we have sourced the "data_analysis/totalReturn_curve.R") and change the data source (PART1, PART2, PART3), we can get the total return curve of the combination strategy based on the difference dataset which can help us to compare the difference of the total return changing between three dataset.
 
 # Optimization part
-In "optim" document, we have 6 files which named "MACD_optimization.R", "MACD_optimization2.R"
-1. For MACD-Momentum strategy, the 
+In "optim" document, we have 6 files which named "optimise_MACD.R", "optimise_MACD2.R".
+1. For MACD-Momentum strategy, run "optimise_MACD.R" can obtain the results of optimisation of MACD-Momentum strategy with random 4 series group. Run "optimise_MACD2.R" can obtain the results of optimisation of MACD-Momentum strategy with series 3 and 9 (expand the range of parameters).
