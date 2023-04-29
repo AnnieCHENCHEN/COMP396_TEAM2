@@ -16,4 +16,5 @@ In "data_analysis" document, we stored: volatility.R, trend_movingAverage.R, vol
 # Optimization part
 In "optim" document, we have 6 files which named "optimise_MACD.R", "optimise_MACD2.R".
 1. For MACD-Momentum strategy, run "optimise_MACD.R" can obtain the results of optimisation of MACD-Momentum strategy with random 4 series group. Run "optimise_MACD2.R" can obtain the results of optimisation of MACD-Momentum strategy with series 3 and 9 (expand the range of parameters).
-2. For TMA-Momentum strategy, run"Optimise_withSeries-MomentumTMA.R" can obtain the results of optimisation of TMA-Momentum strategy with randon 4 series group.
+2. For TMA-Momentum strategy, run "Optimise_withSeries-MomentumTMA.R" can obtain the results of optimisation of TMA-Momentum strategy with randon 4 series group. Run "Optimise_withoutSeries-MomentumTMA.R" can obtain the results of TMA-Momentum strategy with seties 1, 5, 10 (expand the range of parameters).
+3. For turetle trading strategy, run "optimise_turtle.R" can obatin the results of optimisation of turetle trading strategy with random 5 series group. Run "
